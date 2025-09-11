@@ -15,7 +15,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/welcome" />
-
         <View
             android:layout_width="match_parent"
             android:layout_height="200dp"
@@ -26,44 +25,57 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:layout_marginTop="10dp"
         android:fontFamily="@font/poppins_extrabold"
         android:text="Welcome to Smart Band!"
-        android:layout_gravity="center"
         android:textSize="20sp" />
 
     <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="0dp">
+        <View
+            android:layout_width="71dp"
+            android:layout_height="16dp"
+            android:background="@drawable/health_rectangle_health"
+            android:layout_gravity="bottom"/>
         <TextView
+            android:id="@+id/textViewHealth"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Health is number one"
+            android:text="Health Is Number One"
+            android:includeFontPadding="false"
+            android:lineSpacingExtra="0dp"
+            android:padding="0dp"
             android:fontFamily="@font/poppins_extrabold"
             android:textSize="20sp"
-            android:layout_gravity="center"/>
-<!--        <View-->
-<!--            android:layout_width="20px"-->
-<!--            android:layout_height="20px"-->
-<!--            android:background="@drawable/health_rectangle_health"-->
-<!--            android:layout_gravity="center_horizontal|bottom"/>-->
+            android:layout_gravity="center"
+            android:layout_marginTop="-5dp"
+            android:layout_marginBottom="-5dp"/>
+
     </FrameLayout>
 
     <com.google.android.material.button.MaterialButton
-        android:layout_gravity="center"
         android:layout_width="345.46dp"
         android:layout_height="52.93dp"
-        android:text="Login"
+        android:layout_gravity="center"
+        android:layout_marginTop="30dp"
+        android:fontFamily="@font/poppins_medium"
+        android:text="Get Started"
         android:textColor="@android:color/white"
-        android:textSize="18sp"
-        app:cornerRadius="2dp"
-        app:backgroundTint="#010101"/>
+        android:textSize="16.36sp"
+        app:backgroundTint="#010101"
+        app:cornerRadius="2dp" />
 
     <TextView
+        android:id="@+id/signIn"
         android:layout_gravity="center"
         android:layout_width="wrap_content"
+        android:textColorLink="#010101"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="40dp"
         android:text="Already have account? Sign in"/>
 
 
