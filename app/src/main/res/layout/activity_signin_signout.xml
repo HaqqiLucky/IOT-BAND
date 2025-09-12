@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FFFFFF"
+    tools:context=".SigninSignout">
+
+
+    <androidx.fragment.app.FragmentContainerView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/fragment_container_signin_signup"
+        android:layout_width="match_parent"
+        android:layout_height="550.37dp" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="0dp"
+        android:fontFamily="@font/poppins_medium"
+        android:textSize="19.25dp"
+        android:text="Sign in with"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:layout_height="wrap_content">
+
+        <!--        <ImageButton-->
+        <!--            android:id="@+id/imageButton2"-->
+        <!--            android:layout_width="26.07dp"-->
+        <!--            android:layout_height="31.02dp"-->
+        <!--            android:scaleType="fitCenter"-->
+        <!--            app:srcCompat="@drawable/apple" />-->
+
+        <ImageButton
+            android:id="@+id/imageButtonFacebook"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/facebook_logo_primary"
+            android:scaleType="centerCrop"
+            android:layout_marginRight="20dp"
+            android:background="@android:color/transparent"
+            android:padding="0dp"/>
+
+        <ImageButton
+            android:id="@+id/imageButtonGoogle"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/google_logo"
+            android:scaleType="centerCrop"
+            android:background="@android:color/transparent"
+            android:padding="0dp"/>
+
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textViewSignUpSignIn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="70dp"
+        android:text="Don't Have an account? Sign up" />
+
+</LinearLayout>

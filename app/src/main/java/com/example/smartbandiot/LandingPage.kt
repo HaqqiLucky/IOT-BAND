@@ -1,5 +1,6 @@
 package com.example.smartbandiot
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
@@ -20,8 +21,10 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.smartbandiot.databinding.LandingPageBinding
 
+const val FRAGMENT_TO_LOAD_KEY = "fragment_to_load"
 class LandingPage : AppCompatActivity() {
     private lateinit var binding: LandingPageBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -48,10 +51,13 @@ class LandingPage : AppCompatActivity() {
         if (poppinsSpan != null) {
             spannableString.setSpan(poppinsSpan, boldStartIndex, boldEndIndex, 0)
         }
+
+
         val clickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
-                // disini intent ke halaman sign in
-                Toast.makeText(this@LandingPage, "Sign In Diklik!", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this@LandingPage, SigninSignout::class.java)
+                intent.putExtra(FRAGMENT_TO_LOAD_KEY, "SIGN_IN")
+                startActivity(intent)
             }
         }
 
@@ -70,6 +76,13 @@ class LandingPage : AppCompatActivity() {
         binding.signIn.text = spannableString
         binding.signIn.movementMethod = LinkMovementMethod.getInstance() // biar bs di klik
 
+
+
+        binding.getstartedorsignup.setOnClickListener {
+            val intent = Intent(this@LandingPage, SigninSignout::class.java)
+            intent.putExtra(FRAGMENT_TO_LOAD_KEY, "SIGN_UP")
+            startActivity(intent)
+        }
 
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
