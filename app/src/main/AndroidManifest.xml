@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartBandIOT">
         <activity
+            android:name=".PhoneVerivicationActivity"
+            android:exported="false" />
+        <activity
             android:name=".SigninSignout"
             android:exported="false" />
         <activity
