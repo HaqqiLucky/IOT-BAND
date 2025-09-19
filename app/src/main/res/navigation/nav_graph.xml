@@ -3,26 +3,51 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/FirstFragment">
+    app:startDestination="@id/Step1Gender">
 
     <fragment
-        android:id="@+id/FirstFragment"
-        android:name="com.example.smartbandiot.FirstFragment"
-        android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_first" >
-
+        android:id="@+id/Step1Gender"
+        android:name="com.example.smartbandiot.ChooseGenderFragment"
+        android:label="Gender"
+        tools:layout="@layout/fragment_choose_gender" >
         <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
+            android:id="@+id/action1to2_genderToMaingoal"
+            app:destination="@id/Step2MainGoal" />
     </fragment>
     <fragment
-        android:id="@+id/SecondFragment"
-        android:name="com.example.smartbandiot.SecondFragment"
-        android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second" >
-
+        android:id="@+id/Step2MainGoal"
+        android:name="com.example.smartbandiot.ChooseMainGoalFragment"
+        android:label="main_goal"
+        tools:layout="@layout/fragment_choose_main_goal" >
         <action
             android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+            app:destination="@id/Step3Height" />
     </fragment>
+    <fragment
+        android:id="@+id/Step3Height"
+        android:name="com.example.smartbandiot.ChooseHeightFragment"
+        android:label="height"
+        tools:layout="@layout/fragment_choose_height" >
+        <action
+            android:id="@+id/action_SecondFragment_to_FirstFragment"
+            app:destination="@id/Step4Weight" />
+    </fragment>
+    <fragment
+        android:id="@+id/Step4Weight"
+        android:name="com.example.smartbandiot.ChooseWeightFragment"
+        android:label="weight"
+        tools:layout="@layout/fragment_choose_weight" >
+        <action
+            android:id="@+id/action_SecondFragment_to_FirstFragment"
+            app:destination="@id/Step5goalweight" />
+    </fragment>
+    <fragment
+        android:id="@+id/Step5goalweight"
+        android:name="com.example.smartbandiot.ChooseWeightFragment"
+        android:label="goal_weight"
+        tools:layout="@layout/fragment_choose_weight" >
+        <action
+            android:id="@+id/action_SecondFragment_to_FirstFragment" />
+    </fragment>
+
 </navigation>
