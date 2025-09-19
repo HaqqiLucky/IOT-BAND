@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.androidx.navigation.safeargs)
 }
 
 android {
@@ -52,4 +53,5 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation("io.github.chaosleung:pinview:1.4.4") // buat kotak pin phone verif
+    implementation("com.github.addisonelliott:SegmentedButton:3.1.9") // segmented control ios height weight
 }

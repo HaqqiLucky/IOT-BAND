@@ -5,6 +5,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.navigation.findNavController
+import androidx.navigation.ui.setupActionBarWithNavController
 
 class PreferencesActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -12,12 +14,16 @@ class PreferencesActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_preferences)
 
-        if (savedInstanceState == null) {
-            val myFragment = ChooseGenderFragment()
+        val navController = findNavController(R.id.host_fragment_container_preferences)
+        setupActionBarWithNavController(navController)
 
-            supportFragmentManager.beginTransaction()
-                .add(R.id.fragment_container_preferences, myFragment)
-                .commit()
+
+        if (savedInstanceState == null) {
+//            val myFragment = ChooseGenderFragment()
+//
+//            supportFragmentManager.beginTransaction()
+//                .add(R.id.host_fragment_container_preferences, myFragment)
+//                .commit()
 
             ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
                 val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -25,5 +31,9 @@ class PreferencesActivity : AppCompatActivity() {
                 insets
             }
         }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        return findNavController(R.id.host_fragment_container_preferences).navigateUp() || super.onSupportNavigateUp()
     }
 }
