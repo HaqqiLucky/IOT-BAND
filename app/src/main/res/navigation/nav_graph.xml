@@ -27,7 +27,7 @@
         android:id="@+id/Step3Height"
         android:name="com.example.smartbandiot.ChooseHeightFragment"
         android:label="height"
-        tools:layout="@layout/fragment_choose_height" >
+        tools:layout="@layout/fragment_choose_height">
         <action
             android:id="@+id/action_SecondFragment_to_FirstFragment"
             app:destination="@id/Step4Weight" />
@@ -50,4 +50,5 @@
             android:id="@+id/action_SecondFragment_to_FirstFragment" />
     </fragment>
 
+<!--    haha-->
 </navigation>
