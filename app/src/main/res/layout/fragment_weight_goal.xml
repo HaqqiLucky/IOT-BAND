@@ -6,7 +6,7 @@ xmlns:app="http://schemas.android.com/apk/res-auto"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
 android:background="#FFFFFF"
-tools:context=".ChooseWeightFragment">
+tools:context=".WeightGoalFragment">
 
 <LinearLayout
     android:id="@+id/content_container"
@@ -22,8 +22,8 @@ tools:context=".ChooseWeightFragment">
         android:fontFamily="@font/poppins_semibold"
         android:textSize="25.98dp"
         android:gravity="center"
-        android:layout_marginBottom="30dp"
-        android:text="Select weight" />
+        android:layout_marginVertical="50dp"
+        android:text="Select goal weight" />
 
     <com.addisonelliott.segmentedbutton.SegmentedButtonGroup
         android:id="@+id/buttonGroup_lordOfTheRings"
@@ -70,7 +70,7 @@ tools:context=".ChooseWeightFragment">
         android:layout_width="150dp"
         android:layout_height="62dp"
         android:layout_gravity="center"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="40dp"
         android:orientation="horizontal">
 
         <com.google.android.material.textfield.TextInputLayout

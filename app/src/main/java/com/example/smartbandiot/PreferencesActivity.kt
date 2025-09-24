@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupActionBarWithNavController
 
 class PreferencesActivity : AppCompatActivity() {
@@ -14,8 +15,9 @@ class PreferencesActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_preferences)
 
-        val navController = findNavController(R.id.host_fragment_container_preferences)
-        setupActionBarWithNavController(navController)
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.host_fragment_container_preferences) as NavHostFragment
+        val navController = navHostFragment.navController
 
 
         if (savedInstanceState == null) {
