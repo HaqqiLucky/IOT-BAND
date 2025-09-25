@@ -8,16 +8,44 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.example.smartbandiot.databinding.ActivityPreferencesBinding
 
 class PreferencesActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityPreferencesBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_preferences)
+        binding = ActivityPreferencesBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.host_fragment_container_preferences) as NavHostFragment
         val navController = navHostFragment.navController
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.Step1Gender -> binding.step.text = "Step 1 of 5"
+                R.id.Step2MainGoal -> binding.step.text = "Step 2 of 5"
+                R.id.Step3Height -> binding.step.text = "Step 3 of 5"
+                R.id.Step4Weight -> binding.step.text = "Step 4 of 5"
+                R.id.Step5traininglevel -> binding.step.text = "Step 5 of 5"
+            }
+        }
+
+        binding.buttonback.setOnClickListener {
+            navController.navigateUp()
+        }
+
+        binding.skip.setOnClickListener {
+            when (navController.currentDestination?.id) {
+                R.id.Step1Gender -> navController.navigate(R.id.Step2MainGoal)
+                R.id.Step2MainGoal -> navController.navigate(R.id.Step3Height)
+                R.id.Step3Height -> navController.navigate(R.id.Step4Weight)
+                R.id.Step4Weight -> navController.navigate(R.id.Step5traininglevel)
+                R.id.Step5traininglevel -> navController.navigate(R.id.CreatingPlan)
+            }
+        }
 
 
         if (savedInstanceState == null) {

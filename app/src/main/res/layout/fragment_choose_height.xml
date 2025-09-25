@@ -75,8 +75,8 @@ tools:context=".ChooseHeightFragment">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputLayout"
-            android:layout_width="97.75dp"
-            android:layout_height="match_parent"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_gravity="center"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             app:boxCornerRadiusBottomEnd="10dp"
@@ -88,13 +88,16 @@ tools:context=".ChooseHeightFragment">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextUsername"
                 android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:maxLength="3"
-                android:lines="1"
-                android:inputType="numberDecimal"
                 android:gravity="center"
+                android:ellipsize="none"
+                android:textAlignment="center"
+                android:scrollHorizontally="false"
+                android:singleLine="true"
+                android:inputType="numberDecimal"
                 android:textSize="25.98sp"
-                android:fontFamily="@font/poppins_semibold"
-                android:layout_height="wrap_content" />
+                android:fontFamily="@font/poppins_semibold" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
