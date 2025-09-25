@@ -11,7 +11,7 @@
         android:label="Gender"
         tools:layout="@layout/fragment_choose_gender" >
         <action
-            android:id="@+id/action1to2_genderToMaingoal"
+            android:id="@+id/gendertomain"
             app:destination="@id/Step2MainGoal" />
     </fragment>
     <fragment
@@ -20,7 +20,7 @@
         android:label="main_goal"
         tools:layout="@layout/fragment_choose_main_goal" >
         <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
+            android:id="@+id/maintoheight"
             app:destination="@id/Step3Height" />
     </fragment>
     <fragment
@@ -29,7 +29,7 @@
         android:label="height"
         tools:layout="@layout/fragment_choose_height" >
         <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
+            android:id="@+id/heighttoweight"
             app:destination="@id/Step4Weight" />
     </fragment>
     <fragment
@@ -38,14 +38,24 @@
         android:label="weight"
         tools:layout="@layout/fragment_choose_weight" >
         <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/Step5goalweight" />
+            android:id="@+id/weighttotraining"
+            app:destination="@id/Step5traininglevel" />
     </fragment>
     <fragment
-        android:id="@+id/Step5goalweight"
-        android:name="com.example.smartbandiot.ChooseWeightFragment"
+        android:id="@+id/Step5traininglevel"
+        android:name="com.example.smartbandiot.ChooseTrainingLevelFragment"
         android:label="goal_weight"
-        tools:layout="@layout/fragment_choose_weight" >
+        tools:layout="@layout/fragment_choose_training_level" >
+        <action
+            android:id="@+id/trainingtocreating"
+            app:destination="@id/CreatingPlan" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/CreatingPlan"
+        android:name="com.example.smartbandiot.CreatingPlanFragment"
+        android:label="create_plan"
+        tools:layout="@layout/fragment_creating_plan" >
         <action
             android:id="@+id/action_SecondFragment_to_FirstFragment" />
     </fragment>

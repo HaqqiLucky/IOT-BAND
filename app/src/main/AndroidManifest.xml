@@ -15,6 +15,9 @@
             android:name=".PreferencesActivity"
             android:exported="false" />
         <activity
+            android:name=".Dashboard"
+            android:exported="false" />
+        <activity
             android:name=".PhoneVerivicationActivity"
             android:exported="false" />
         <activity

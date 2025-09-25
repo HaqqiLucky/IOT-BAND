@@ -41,15 +41,10 @@ class PhoneVerivicationActivity : AppCompatActivity() {
         changeText.setSpan(UnderlineSpan(), 0, changeText.length, 0)
         binding.change.text = changeText
 
-//        binding.change.setOnClickListener {
-//            val intent = Intent(this, SigninSignout::class.java)
-//            intent.putExtra(FRAGMENT_TO_LOAD_KEY, "SIGN_UP")
-//            startActivity(intent)
-
-            binding.change.setOnClickListener {
-                val intent = Intent(this, PreferencesActivity::class.java)
-                intent.putExtra(FRAGMENT_TO_LOAD_KEY, "SIGN_UP")
-                startActivity(intent)
+        binding.change.setOnClickListener {
+            val intent = Intent(this, PreferencesActivity::class.java)
+            startActivity(intent)
+            finish() // biar g bs balik ke verif
         }
 
 
