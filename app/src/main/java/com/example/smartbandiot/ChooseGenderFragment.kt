@@ -41,7 +41,18 @@ class ChooseGenderFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentChooseGenderBinding.inflate(inflater, container, false)
+
+        val genders = listOf(binding.man, binding.genderNeutral, binding.woman)
+
+        genders.forEach { gender ->
+                gender.setOnClickListener {
+                    genders.forEach { it.isChecked }
+                    gender.isChecked = true
+                    binding.continu.isEnabled = true
+                }
+        }
         return binding.root
+
     }
 
 

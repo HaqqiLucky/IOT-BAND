@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.example.smartbandiot.databinding.FragmentChooseGenderBinding
+import com.example.smartbandiot.databinding.FragmentChooseMainGoalBinding
+import com.example.smartbandiot.databinding.FragmentChooseTrainingLevelBinding
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -20,7 +22,7 @@ private const val ARG_PARAM2 = "param2"
  */
 class ChooseMainGoalFragment : Fragment() {
     // TODO: Rename and change types of parameters
-    private var _binding: FragmentChooseGenderBinding? = null
+    private var _binding: FragmentChooseMainGoalBinding? = null
 
     private val binding get() = _binding!!
     private var param1: String? = null
@@ -38,7 +40,7 @@ class ChooseMainGoalFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentChooseGenderBinding.inflate(inflater, container, false)
+        _binding = FragmentChooseMainGoalBinding.inflate(inflater, container, false)
         return binding.root
     }
 

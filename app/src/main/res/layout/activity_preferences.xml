@@ -15,12 +15,14 @@
         android:orientation="horizontal">
 
         <ImageButton
+            android:id="@+id/buttonback"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/outline_arrow_back_24"
             android:backgroundTint="@color/material_on_primary_disabled"/>
 
         <TextView
+            android:id="@+id/step"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fontFamily="@font/poppins_medium"

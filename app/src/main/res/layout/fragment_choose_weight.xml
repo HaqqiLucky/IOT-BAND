@@ -75,8 +75,8 @@ tools:context=".ChooseWeightFragment">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputLayout"
-            android:layout_width="97.75dp"
-            android:layout_height="match_parent"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_gravity="center"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             app:boxCornerRadiusBottomEnd="10dp"
@@ -88,8 +88,9 @@ tools:context=".ChooseWeightFragment">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextUsername"
                 android:layout_width="match_parent"
-                android:hint="122"
+
                 android:inputType="numberDecimal"
+                android:scrollHorizontally="false"
                 android:maxLength="3"
                 android:gravity="center"
                 android:textSize="25.98sp"
