@@ -3,6 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="lime_green">#BBF246</color>
+    <color name="green_app_theme">#BAFF29</color>
     <color name="dark_grey">#384046</color>
     <color name="fine_grey">#5E6468</color>
     <color name="light_grey">#8B8F92</color>
@@ -10,4 +11,5 @@
     <color name="stroke_abu_abu">#E5E9EF</color>
     <color name="biru_loading">#3C3DF5</color>
     <color name="putih_loading">#F1F4F8</color>
+    <color name="black_navbar">#192126</color>
 </resources>

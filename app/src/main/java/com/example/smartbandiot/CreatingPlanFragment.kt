@@ -54,9 +54,9 @@ class CreatingPlanFragment : Fragment() {
         }
 
         binding.continu.setOnClickListener {
-            val intent = Intent(requireContext(), Dashboard::class.java)
+            val intent = Intent(requireContext(), MainActivity::class.java)
             startActivity(intent)
-            requireActivity().finish()
+            requireActivity().finish() // g bs balik lagi blee
         }
     }
 

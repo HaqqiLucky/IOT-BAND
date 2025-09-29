@@ -58,4 +58,5 @@ dependencies {
     implementation("io.github.chaosleung:pinview:1.4.4") // buat kotak pin phone verif
     implementation("com.github.addisonelliott:SegmentedButton:3.1.9") // segmented control ios height weight
     implementation("com.mikhaellopez:circularprogressbar:3.1.0") // loading bulet
+    implementation("com.github.ismaeldivita:chip-navigation-bar:1.4.0") //navbar di main activity
 }
