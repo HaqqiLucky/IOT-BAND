@@ -26,13 +26,12 @@ class ChooseGenderFragment : Fragment() {
 
     // TODO: Rename and change types of parameters
     private var param1: String? = null
-    private var param2: String? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
         }
     }
 
@@ -41,16 +40,6 @@ class ChooseGenderFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentChooseGenderBinding.inflate(inflater, container, false)
-
-        val genders = listOf(binding.man, binding.genderNeutral, binding.woman)
-
-        genders.forEach { gender ->
-                gender.setOnClickListener {
-                    genders.forEach { it.isChecked }
-                    gender.isChecked = true
-                    binding.continu.isEnabled = true
-                }
-        }
         return binding.root
 
     }
@@ -59,18 +48,26 @@ class ChooseGenderFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val genders = listOf(binding.man, binding.neutral, binding.woman)
+
+        binding.continu.isEnabled = false
+        genders.forEach { gender ->
+            gender.setOnClickListener {
+                genders.forEach {
+                    it.isChecked = false
+                    it.isSelected = false
+                }
+                gender.isSelected = true
+                gender.isChecked = true
+                binding.continu.isEnabled = true
+            }
+        }
+
         binding.continu.setOnClickListener {
             findNavController().navigate(R.id.gendertomain)
         }
     }
 
-//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//        super.onViewCreated(view, savedInstanceState)
-//
-//        binding.continu.setOnClickListener {
-//            startActivity(Intent(requireActivity(), MainActivity::class.java))
-//        }
-//    }
 
     companion object {
         /**

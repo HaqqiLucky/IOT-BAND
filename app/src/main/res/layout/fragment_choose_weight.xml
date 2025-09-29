@@ -73,32 +73,18 @@ tools:context=".ChooseWeightFragment">
         android:layout_marginTop="20dp"
         android:orientation="horizontal">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textInputLayout"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_gravity="center"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            app:boxCornerRadiusBottomEnd="10dp"
-            app:boxCornerRadiusBottomStart="10dp"
-            app:boxCornerRadiusTopEnd="10dp"
-            app:boxStrokeColor="#E5E9EF"
-            app:boxCornerRadiusTopStart="10dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editTextUsername"
-                android:layout_width="match_parent"
-
-                android:inputType="numberDecimal"
-                android:scrollHorizontally="false"
-                android:maxLength="3"
-                android:gravity="center"
-                android:textSize="25.98sp"
-                android:fontFamily="@font/poppins_semibold"
-                android:layout_height="wrap_content" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
+        <EditText
+            android:layout_width="97.75dp"
+            android:layout_height="62dp"
+            android:background="@drawable/edit_text_weight_height"
+            android:fontFamily="@font/poppins_semibold"
+            android:gravity="center"
+            android:textSize="25.98sp"
+            android:inputType="numberDecimal"
+            android:maxLength="3"
+            android:maxLines="1"
+            android:textColor="@color/black"
+            android:padding="10dp"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -118,10 +104,11 @@ tools:context=".ChooseWeightFragment">
     android:layout_width="match_parent"
     android:layout_height="53dp"
     android:text="Continue"
-    android:backgroundTint="#000000"
     android:layout_marginHorizontal="15dp"
     android:layout_marginBottom="50dp"
     app:cornerRadius="5dp"
+    app:backgroundTint="@color/enable_disable"
+    android:textColor="@color/white"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintEnd_toEndOf="parent" />

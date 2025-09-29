@@ -41,6 +41,16 @@ class ChooseMainGoalFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentChooseMainGoalBinding.inflate(inflater, container, false)
+
+        binding.continu.isEnabled = false
+        val main_goals = listOf(binding.keepFit, binding.loseWeight)
+        main_goals.forEach { goal ->
+            goal.setOnClickListener {
+                main_goals.forEach { it.isSelected = false }
+                goal.isSelected = true
+                binding.continu.isEnabled = true
+            }
+        }
         return binding.root
     }
 

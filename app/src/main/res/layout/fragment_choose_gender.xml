@@ -24,61 +24,97 @@
             android:gravity="center"
             android:text="Choose gender" />
 
-        <com.google.android.material.button.MaterialButtonToggleGroup
-            android:id="@+id/gender_group"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="15dp"
-            android:layout_marginTop="15dp"
-            app:singleSelection="true"
-            app:selectionRequired="true"
-            android:orientation="vertical">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/woman"
-                android:layout_width="match_parent"
-                android:layout_height="87dp"
-                android:text="👩   Woman"
-                android:textColor="#0A0615"
-                android:fontFamily="@font/poppins_medium"
-                android:textSize="15.4dp"
-                app:cornerRadius="10dp"
-                android:gravity="center|left"
-                app:backgroundTint="@android:color/transparent"
-                app:strokeColor="@color/button_stroke_selected_preferences"
-                app:strokeWidth="1dp" />
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/woman"
+            android:layout_width="360dp"
+            android:backgroundTint="#FFFFFF"
+            app:checkedIcon="@null"
+            app:cardForegroundColor="@android:color/transparent"
+            android:layout_gravity="center"
+            app:cardCornerRadius="7.7dp"
+            android:clickable="true"
+            android:checkable="true"
+            app:cardElevation="0dp"
+            android:layout_height="94dp">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/man"
-                android:layout_width="match_parent"
-                android:layout_height="87dp"
-                android:layout_marginTop="10dp"
-                android:text="👨   Man"
-                android:textColor="#0A0615"
-                android:fontFamily="@font/poppins_medium"
-                android:textSize="15.4dp"
-                app:cornerRadius="10dp"
-                android:gravity="center|left"
-                app:backgroundTint="@android:color/transparent"
-                app:strokeColor="@color/button_stroke_selected_preferences"
-                app:strokeWidth="1dp" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|left"
+                android:paddingLeft="20dp"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15.4sp"
+                    android:fontFamily="@font/poppins_medium"
+                    android:text="👩   Woman"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/gender_neutral"
-                android:layout_width="match_parent"
-                android:layout_height="87dp"
-                android:layout_marginTop="10dp"
-                android:text="🫂   Gender Neutral"
-                android:textColor="#0A0615"
-                android:fontFamily="@font/poppins_medium"
-                android:textSize="15.4dp"
-                app:cornerRadius="10dp"
-                android:gravity="center|left"
-                app:backgroundTint="@android:color/transparent"
-                app:strokeColor="@color/button_stroke_selected_preferences"
-                app:strokeWidth="1dp" />
+        <!--irregular training-->
 
-        </com.google.android.material.button.MaterialButtonToggleGroup>
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/man"
+            android:layout_width="360dp"
+            android:backgroundTint="#FFFFFF"
+            android:layout_gravity="center"
+            app:cardCornerRadius="7.7dp"
+            app:checkedIcon="@null"
+            app:cardForegroundColor="@android:color/transparent"
+            android:layout_marginTop="10dp"
+            android:clickable="true"
+            android:checkable="true"
+            app:cardElevation="0dp"
+            android:layout_height="94dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|left"
+                android:paddingLeft="20dp"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15.4sp"
+                    android:fontFamily="@font/poppins_medium"
+                    android:text="👨   Man"/>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!--    medium-->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/neutral"
+            android:layout_width="360dp"
+            android:backgroundTint="#FFFFFF"
+            android:layout_gravity="center"
+            app:checkedIcon="@null"
+            app:cardForegroundColor="@android:color/transparent"
+            app:cardCornerRadius="7.7dp"
+            android:layout_marginTop="10dp"
+            android:clickable="true"
+            android:checkable="true"
+            app:cardElevation="0dp"
+            android:layout_height="94dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|left"
+                android:paddingLeft="20dp"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15.4sp"
+                    android:fontFamily="@font/poppins_medium"
+                    android:text="🫂   Gender Neutral"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
 
     </LinearLayout>
 
@@ -87,13 +123,14 @@
         android:layout_width="match_parent"
         android:layout_height="53dp"
         android:text="Continue"
-        android:backgroundTint="#000000"
         android:layout_marginHorizontal="15dp"
         android:layout_marginBottom="50dp"
         app:cornerRadius="5dp"
-        android:enabled="false"
+        app:backgroundTint="@color/enable_disable"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
