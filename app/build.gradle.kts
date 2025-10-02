@@ -60,4 +60,5 @@ dependencies {
     implementation("com.mikhaellopez:circularprogressbar:3.1.0") // loading bulet
     implementation("com.github.ismaeldivita:chip-navigation-bar:1.4.0") //navbar di main activity
     implementation("androidx.recyclerview:recyclerview:1.3.1") //recycleview
+//    implementation(com.github.bumptech.glide:glide:4.16.0) //upload foto buat profil
 }
