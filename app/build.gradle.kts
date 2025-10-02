@@ -61,4 +61,5 @@ dependencies {
     implementation("com.github.ismaeldivita:chip-navigation-bar:1.4.0") //navbar di main activity
 
 //    implementation(com.github.bumptech.glide:glide:4.16.0) //upload foto buat profil
+    implementation("androidx.recyclerview:recyclerview:1.3.1") //recycleview
 }

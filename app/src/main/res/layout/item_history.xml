@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="329dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:backgroundTint="@color/green_item_at_home"
+    android:layout_height="166dp"
+    android:layout_marginBottom="20dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/star"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:background="@drawable/circle_star_for_home"
+            android:src="@drawable/outline_star_24"
+            android:scaleType="centerCrop"
+            android:layout_margin="20dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+        
+        <TextView
+            android:id="@+id/date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="16/7/2024"
+            android:fontFamily="@font/outfit_extralight"
+            android:textSize="12sp"
+            android:layout_marginLeft="10dp"
+            app:layout_constraintTop_toTopOf="@id/star"
+            app:layout_constraintStart_toEndOf="@id/star"
+            app:layout_constraintBottom_toBottomOf="@id/star"/>
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Monday Morning Run"
+            android:fontFamily="@font/outfit_extrabold"
+            android:textSize="12sp"
+            android:layout_marginTop="14dp"
+            app:layout_constraintTop_toBottomOf="@id/star"
+            app:layout_constraintStart_toStartOf="@id/star"/>
+
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="15.00"
+            android:textColor="@color/red_time"
+            android:fontFamily="@font/outfit_semibold"
+            android:layout_marginTop="8dp"
+            android:textSize="13sp"
+            app:layout_constraintTop_toBottomOf="@id/title"
+            app:layout_constraintStart_toStartOf="@id/title"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Time"
+            android:textSize="12sp"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/outfit_regular"
+            app:layout_constraintTop_toBottomOf="@id/time"
+            app:layout_constraintEnd_toEndOf="@id/time"
+            app:layout_constraintStart_toStartOf="@id/time"/>
+
+        <TextView
+            android:id="@+id/pace"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5’00’’"
+            android:textColor="@color/red_time"
+            android:fontFamily="@font/outfit_semibold"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="21dp"
+            android:textSize="13sp"
+            app:layout_constraintTop_toBottomOf="@id/title"
+            app:layout_constraintStart_toEndOf="@id/time"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pace"
+            android:textSize="12sp"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="-4dp"
+            android:fontFamily="@font/outfit_regular"
+            app:layout_constraintEnd_toEndOf="@id/pace"
+            app:layout_constraintTop_toBottomOf="@id/pace"
+            app:layout_constraintStart_toStartOf="@id/pace"/>
+
+        <TextView
+            android:id="@+id/total_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3,00 Km"
+            android:textSize="32sp"
+            android:fontFamily="@font/outfit_bold"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginRight="20dp"/>
+        
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/rectangle_km_home"
+            android:layout_marginRight="3dp"
+            app:layout_constraintTop_toBottomOf="@id/total_distance"
+            app:layout_constraintEnd_toEndOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
