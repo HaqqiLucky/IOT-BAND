@@ -12,4 +12,10 @@
     <color name="biru_loading">#3C3DF5</color>
     <color name="putih_loading">#F1F4F8</color>
     <color name="black_navbar">#192126</color>
+    <color name="no_device_red">#FF3D00</color>
+    <color name="putih_home">#FDFDFD</color>
+    <color name="green_item_at_home">#E7FFF8</color>
+    <color name="red_time">#FF6363</color>
+
+
 </resources>
