@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.profile -> {
                     supportFragmentManager.beginTransaction()
-                        .replace(R.id.container, HomeFragment())
+                        .replace(R.id.container, UserProfileFragment())
                         .commit()
                 }
             }
