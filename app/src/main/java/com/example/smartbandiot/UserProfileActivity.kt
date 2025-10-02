@@ -47,7 +47,7 @@ class UserProfileActivity : AppCompatActivity() {
         btnSettings = findViewById(R.id.btnSettings)
         imgProfile = findViewById(R.id.imgProfile)
         tvUserName = findViewById(R.id.tvUserName)
-        tvWeight = findViewById(R.id.tvWeight)
+        tvnWeight = findViewById(R.id.tvWeight)
         tvHeight = findViewById(R.id.tvHeight)
         tvAge = findViewById(R.id.tvAge)
         btnToday = findViewById(R.id.btnToday)
