@@ -62,7 +62,8 @@
         app:shapeAppearanceOverlay="@style/CircleImageView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/topBar" />
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        />
 
     <!-- User Name -->
     <TextView
@@ -294,9 +295,10 @@
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:layout_marginTop="8dp"
-                    android:src="@drawable/heart_wave"
+                    android:src="@drawable/outline_heart"
                     android:scaleType="fitCenter"
-                    android:contentDescription="Heart Wave" />
+                    android:contentDescription="Heart Wave"
+                />
 
                 <TextView
                     android:id="@+id/tvHeartRate"
@@ -369,10 +371,11 @@
                         android:layout_height="80dp"
                         android:layout_centerInParent="true"
                         android:indeterminate="false"
-                        android:max="12"
-                        android:progress="8"
-                        android:progressDrawable="@drawable/circular_progress"
-                        android:rotation="-90" />
+                        android:max="12"/>
+<!--                        android:progress="8"-->
+<!--                        android:progressDrawable="@drawable/circular_progress"-->
+<!--                        android:rotation="-90" -->
+<!--                    />-->
 
                     <LinearLayout
                         android:layout_width="wrap_content"
