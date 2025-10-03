@@ -1,18 +1,15 @@
 package com.example.smartbandiot.model
 
-// Contoh di SetupActivity atau OnboardingActivity
-val userPrefs = UserPreferencesManager(this)
+import java.nio.file.Path
 
-val user = User(
-    name = etName.text.toString(),
-    weight = etWeight.text.toString().toInt(),
-    height = etHeight.text.toString().toInt(),
-    age = etAge.text.toString().toInt(),
-    profileImagePath = selectedImageUri.toString(),
-    email = etEmail.text.toString(),
-    gender = selectedGender
+// Data class untuk menyimpan informasi user
+
+data class User (
+    val name: String,
+    val weight: Int,
+    val height: Int,
+    val age: Int,
+    val profileImagePath: String,
+    val email: String,
+    val gender: String
 )
-
-userPrefs.saveUserData(user)
-
-data class User()
