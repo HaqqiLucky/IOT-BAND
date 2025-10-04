@@ -1,6 +1,7 @@
 package com.example.smartbandiot
 
 import android.os.Bundle
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -25,18 +26,55 @@ class PreferencesActivity : AppCompatActivity() {
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.Step1Gender -> binding.step.text = "Step 1 of 5"
-                R.id.Step2MainGoal -> binding.step.text = "Step 2 of 5"
-                R.id.Step3Height -> binding.step.text = "Step 3 of 5"
-                R.id.Step4Weight -> binding.step.text = "Step 4 of 5"
-                R.id.Step5traininglevel -> binding.step.text = "Step 5 of 5"
+                R.id.Step1Gender -> {
+                    binding.step.text = "Step 1 of 5"
+                    binding.buttonback.visibility = View.GONE
+                    binding.skip.visibility = View.VISIBLE
+                }
+                R.id.Step2MainGoal -> {
+                    binding.step.text = "Step 2 of 5"
+                    binding.buttonback.visibility = View.VISIBLE
+                    binding.skip.visibility = View.VISIBLE
+                }
+                R.id.Step3Height -> {
+                    binding.step.text = "Step 3 of 5"
+                    binding.buttonback.visibility = View.VISIBLE
+                    binding.skip.visibility = View.VISIBLE
+                }
+                R.id.Step4Weight -> {
+                    binding.step.text = "Step 4 of 5"
+                    binding.buttonback.visibility = View.VISIBLE
+                    binding.skip.visibility = View.VISIBLE
+                }
+                R.id.Step5traininglevel -> {
+                    binding.step.text = "Step 5 of 5"
+                    binding.step.visibility = View.VISIBLE
+                    binding.buttonback.visibility = View.VISIBLE
+                    binding.skip.visibility = View.VISIBLE
+                }
+                R.id.CreatingPlan -> {
+                    binding.step.visibility = View.GONE
+                    binding.skip.visibility = View.GONE
+                    binding.buttonback.visibility = View.VISIBLE
+                }
             }
         }
 
+
+//        navController.addOnDestinationChangedListener { _, destination, _ ->
+//            when (destination.id) {
+//                R.id.Step1Gender -> binding.step.text = "Step 1 of 5"
+//                R.id.Step2MainGoal -> binding.step.text = "Step 2 of 5"
+//                R.id.Step3Height -> binding.step.text = "Step 3 of 5"
+//                R.id.Step4Weight -> binding.step.text = "Step 4 of 5"
+//                R.id.Step5traininglevel -> binding.step.text = "Step 5 of 5"
+//            }
+//        }
+//
         binding.buttonback.setOnClickListener {
             navController.navigateUp()
         }
-
+//
         binding.skip.setOnClickListener {
             when (navController.currentDestination?.id) {
                 R.id.Step1Gender -> navController.navigate(R.id.Step2MainGoal)
@@ -46,7 +84,14 @@ class PreferencesActivity : AppCompatActivity() {
                 R.id.Step5traininglevel -> navController.navigate(R.id.CreatingPlan)
             }
         }
-
+//
+//        if (navController.currentDestination?.id == R.id.CreatingPlan) {
+//            binding.skip.visibility = View.GONE
+//        }
+//
+//        if (navController.currentDestination?.id == R.id.Step1Gender) {
+//            binding.buttonback.visibility = View.GONE
+//        }
 
         if (savedInstanceState == null) {
 //            val myFragment = ChooseGenderFragment()

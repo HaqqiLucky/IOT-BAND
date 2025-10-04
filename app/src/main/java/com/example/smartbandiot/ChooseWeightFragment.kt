@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.addTextChangedListener
 import androidx.navigation.fragment.findNavController
 import com.example.smartbandiot.databinding.FragmentChooseHeightBinding
 import com.example.smartbandiot.databinding.FragmentChooseWeightBinding
@@ -48,6 +49,18 @@ class ChooseWeightFragment : Fragment() {
 
         binding.continu.setOnClickListener {
             findNavController().navigate(R.id.weighttotraining)
+        }
+
+        binding.buttonGroup.setOnPositionChangedListener { position ->
+            when (position) {
+                0 -> binding.kglb.text = "lb"
+                1 -> binding.kglb.text = "kg"
+            }
+        }
+
+        binding.continu.isEnabled =false
+        binding.editTextWeight.addTextChangedListener { text->
+            binding.continu.isEnabled = !text.isNullOrBlank()
         }
     }
 
