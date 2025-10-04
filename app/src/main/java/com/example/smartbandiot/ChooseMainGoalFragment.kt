@@ -44,10 +44,15 @@ class ChooseMainGoalFragment : Fragment() {
 
         binding.continu.isEnabled = false
         val main_goals = listOf(binding.keepFit, binding.loseWeight)
-        main_goals.forEach { goal ->
-            goal.setOnClickListener {
-                main_goals.forEach { it.isSelected = false }
-                goal.isSelected = true
+        binding.continu.isEnabled = false
+        main_goals.forEach { gender ->
+            gender.setOnClickListener {
+                main_goals.forEach {
+                    it.isChecked = false
+                    it.isSelected = false
+                }
+                gender.isSelected = true
+                gender.isChecked = true
                 binding.continu.isEnabled = true
             }
         }

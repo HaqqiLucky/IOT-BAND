@@ -26,7 +26,7 @@ tools:context=".ChooseWeightFragment">
         android:text="Select weight" />
 
     <com.addisonelliott.segmentedbutton.SegmentedButtonGroup
-        android:id="@+id/buttonGroup_lordOfTheRings"
+        android:id="@+id/buttonGroup"
         android:layout_width="242.49dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -39,6 +39,7 @@ tools:context=".ChooseWeightFragment">
         app:radius="30dp">
 
         <com.addisonelliott.segmentedbutton.SegmentedButton
+            android:id="@+id/pound"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -48,10 +49,11 @@ tools:context=".ChooseWeightFragment">
             app:selectedBackground="#FFFFFF"
             app:selectedTextColor="#404B52"
             app:text="Pound"
-            app:rounded="true"
+            app:rounded="false"
             app:textColor="@color/black" />
 
         <com.addisonelliott.segmentedbutton.SegmentedButton
+            android:id="@+id/kg"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -61,7 +63,7 @@ tools:context=".ChooseWeightFragment">
             android:padding="10dp"
             app:selectedTextColor="#404B52"
             app:text="Kilogram"
-            app:rounded="true"
+            app:rounded="false"
             app:textColor="@color/black" />
 
     </com.addisonelliott.segmentedbutton.SegmentedButtonGroup>
@@ -74,6 +76,7 @@ tools:context=".ChooseWeightFragment">
         android:orientation="horizontal">
 
         <EditText
+            android:id="@+id/edit_text_weight"
             android:layout_width="97.75dp"
             android:layout_height="62dp"
             android:background="@drawable/edit_text_weight_height"
@@ -87,12 +90,13 @@ tools:context=".ChooseWeightFragment">
             android:padding="10dp"/>
 
         <TextView
+            android:id="@+id/kglb"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginLeft="5dp"
             android:fontFamily="@font/opensans_regular"
-            android:text="kg"
+            android:text="lb"
             android:textSize="15.4sp" />
     </LinearLayout>
 

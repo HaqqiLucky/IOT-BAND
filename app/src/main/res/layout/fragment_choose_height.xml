@@ -26,7 +26,7 @@ tools:context=".ChooseHeightFragment">
         android:text="Select height" />
 
     <com.addisonelliott.segmentedbutton.SegmentedButtonGroup
-        android:id="@+id/buttonGroup_lordOfTheRings"
+        android:id="@+id/buttonGroup"
         android:layout_width="242.49dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -48,7 +48,7 @@ tools:context=".ChooseHeightFragment">
             app:selectedBackground="#FFFFFF"
             app:selectedTextColor="#404B52"
             app:text="Feet"
-            app:rounded="true"
+            app:rounded="false"
             app:textColor="@color/black" />
 
         <com.addisonelliott.segmentedbutton.SegmentedButton
@@ -61,7 +61,7 @@ tools:context=".ChooseHeightFragment">
             android:padding="10dp"
             app:selectedTextColor="#404B52"
             app:text="Centimeter"
-            app:rounded="true"
+            app:rounded="false"
             app:textColor="@color/black" />
 
     </com.addisonelliott.segmentedbutton.SegmentedButtonGroup>
@@ -74,6 +74,7 @@ tools:context=".ChooseHeightFragment">
         android:orientation="horizontal">
 
         <EditText
+            android:id="@+id/edit_text_height"
             android:layout_width="97.75dp"
             android:layout_height="62dp"
             android:background="@drawable/edit_text_weight_height"
@@ -88,6 +89,7 @@ tools:context=".ChooseHeightFragment">
 
 
         <TextView
+            android:id="@+id/ftcm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

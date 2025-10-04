@@ -58,6 +58,11 @@ class CreatingPlanFragment : Fragment() {
             startActivity(intent)
             requireActivity().finish() // g bs balik lagi blee
         }
+
+        binding.continu.isEnabled = false
+        if (binding.persenanloading.text.toString() == "100%"){
+            binding.continu.isEnabled = true
+        }
     }
 
     companion object {

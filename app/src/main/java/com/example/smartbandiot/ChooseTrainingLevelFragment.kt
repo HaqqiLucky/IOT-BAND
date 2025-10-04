@@ -53,14 +53,19 @@ class ChooseTrainingLevelFragment : Fragment() {
             binding.advance
         )
 
-        cardo_sengko.forEach { kartu ->
-            kartu.setOnClickListener {
-                cardo_sengko.forEach { it.strokeColor = ContextCompat.getColor(requireContext(),R.color.stroke_abu_abu); it.isChecked = false }
-                kartu.isChecked = true
-                kartu.strokeColor = ContextCompat.getColor(requireContext(),R.color.black)
+        binding.continu.isEnabled = false
+        cardo_sengko.forEach { gender ->
+            gender.setOnClickListener {
+                cardo_sengko.forEach {
+                    it.isChecked = false
+                    it.isSelected = false
+                }
+                gender.isSelected = true
+                gender.isChecked = true
+                binding.continu.isEnabled = true
             }
-
         }
+
 
         return binding.root
     }

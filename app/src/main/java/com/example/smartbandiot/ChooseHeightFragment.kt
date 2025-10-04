@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.addTextChangedListener
 import androidx.navigation.fragment.findNavController
 import com.example.smartbandiot.databinding.FragmentChooseGenderBinding
 import com.example.smartbandiot.databinding.FragmentChooseHeightBinding
@@ -49,6 +50,18 @@ class ChooseHeightFragment : Fragment() {
 
         binding.continu.setOnClickListener {
             findNavController().navigate(R.id.heighttoweight)
+        }
+
+        binding.buttonGroup.setOnPositionChangedListener { position ->
+            when (position) {
+                0 -> binding.ftcm.text = "ft"
+                1 -> binding.ftcm.text = "cm"
+            }
+        }
+
+        binding.continu.isEnabled =false
+        binding.editTextHeight.addTextChangedListener { text->
+            binding.continu.isEnabled = !text.isNullOrBlank()
         }
     }
 
