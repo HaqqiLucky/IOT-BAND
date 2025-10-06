@@ -62,4 +62,5 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.1") //recycleview
 //    implementation(com.github.bumptech.glide:glide:4.16.0) //upload foto buat profil
     implementation("androidx.recyclerview:recyclerview:1.3.1") //recycleview
+    implementation("de.hdodenhof:circleimageview:3.1.0")
 }
