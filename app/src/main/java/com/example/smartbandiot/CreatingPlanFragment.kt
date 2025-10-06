@@ -46,11 +46,13 @@ class CreatingPlanFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.circularProgressBar.apply {
-            setProgressWithAnimation(100f, 12000)
+            setProgressWithAnimation(100f, 10000)
         }
 
+        binding.continu.isEnabled = false
         binding.circularProgressBar.onProgressChangeListener = { progress ->
             binding.persenanloading.text = "${progress.toInt()}%"
+            binding.continu.isEnabled = (binding.persenanloading.text == "100%")
         }
 
         binding.continu.setOnClickListener {
@@ -59,10 +61,10 @@ class CreatingPlanFragment : Fragment() {
             requireActivity().finish() // g bs balik lagi blee
         }
 
-        binding.continu.isEnabled = false
-        if (binding.persenanloading.text.toString() == "100%"){
-            binding.continu.isEnabled = true
-        }
+
+//        if (binding.persenanloading.text.toString() == "100%"){
+
+//        }
     }
 
     companion object {
