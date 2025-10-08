@@ -1,6 +1,7 @@
 package com.example.smartbandiot
 
 import android.os.Bundle
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -22,6 +23,13 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        //
+        supportFragmentManager.addOnBackStackChangedListener {
+            val currentFragment = supportFragmentManager.findFragmentById(R.id.container)
+            val shouldHideNavbar = currentFragment is SettingsFragment || currentFragment is EditProfileFragment
+
+            binding.bottomNavbarMainActivity.visibility = if (shouldHideNavbar) View.GONE else View.VISIBLE
+        }
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
