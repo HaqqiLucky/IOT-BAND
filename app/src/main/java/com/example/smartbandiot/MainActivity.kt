@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
             val currentFragment = supportFragmentManager.findFragmentById(R.id.container)
             val shouldHideNavbar = currentFragment is SettingsFragment || currentFragment is EditProfileFragment
 
-            binding.bottomNavbarMainActivity.visibility = if (shouldHideNavbar) View.GONE else View.VISIBLE
+            binding.navigationMain.visibility = if (shouldHideNavbar) View.GONE else View.VISIBLE
         }
 
         if (savedInstanceState == null) {

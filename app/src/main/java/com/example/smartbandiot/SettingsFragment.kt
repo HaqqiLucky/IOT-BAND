@@ -44,12 +44,12 @@ class SettingsFragment : Fragment() {
 
     private fun hideBottomNavBar() {
         // Sembunyikan container navbar (MaterialCardView)
-        activity?.findViewById<View>(R.id.bottom_navbar_main_activity)?.visibility = View.GONE
+        activity?.findViewById<View>(R.id.navigation_main)?.visibility = View.GONE
     }
 
     private fun showBottomNavBar() {
         // Tampilkan container navbar (MaterialCardView)
-        activity?.findViewById<View>(R.id.bottom_navbar_main_activity)?.visibility = View.VISIBLE
+        activity?.findViewById<View>(R.id.navigation_main)?.visibility = View.VISIBLE
     }
 
     private fun initViews(view: View) {

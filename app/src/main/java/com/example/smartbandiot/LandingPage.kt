@@ -76,14 +76,11 @@ class LandingPage : AppCompatActivity() {
         binding.signIn.text = spannableString
         binding.signIn.movementMethod = LinkMovementMethod.getInstance() // biar bs di klik
 
-
-
         binding.getstartedorsignup.setOnClickListener {
             val intent = Intent(this@LandingPage, SigninSignout::class.java)
             intent.putExtra(FRAGMENT_TO_LOAD_KEY, "SIGN_UP")
             startActivity(intent)
         }
-
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
