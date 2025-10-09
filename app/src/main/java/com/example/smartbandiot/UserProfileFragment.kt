@@ -39,7 +39,7 @@ class UserProfileFragment : Fragment() {
 
     private fun showBottomNavBar() {
 //        activity?.findViewById<View>(R.id.bottom_navbar_main_activity)?.visibility = View.VISIBLE
-        activity?.findViewById<View>(R.id.bottom_navbar_main_activity)?.visibility = View.VISIBLE
+        activity?.findViewById<View>(R.id.navigation_main)?.visibility = View.VISIBLE
 
 
     }
