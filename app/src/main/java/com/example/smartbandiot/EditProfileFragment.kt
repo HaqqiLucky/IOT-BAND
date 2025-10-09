@@ -46,6 +46,9 @@ class EditProfileFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_edit_profile, container, false)
 
+        // Sembunyikan bottom navbar
+        hideBottomNavBar()
+
         // Inisialisasi views
         initViews(view)
 
@@ -59,6 +62,22 @@ class EditProfileFragment : Fragment() {
         loadUserData()
 
         return view
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // Tampilkan kembali bottom navbar saat fragment dihancurkan
+        showBottomNavBar()
+    }
+
+    private fun hideBottomNavBar() {
+        // Sembunyikan container navbar (MaterialCardView)
+        activity?.findViewById<View>(R.id.bottom_navbar_main_activity)?.visibility = View.GONE
+    }
+
+    private fun showBottomNavBar() {
+        // Tampilkan container navbar (MaterialCardView)
+        activity?.findViewById<View>(R.id.bottom_navbar_main_activity)?.visibility = View.VISIBLE
     }
 
     private fun initViews(view: View) {
@@ -87,7 +106,7 @@ class EditProfileFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
-        // Back button
+        // Back button - kembali ke SettingsFragment
         btnBack.setOnClickListener {
             parentFragmentManager.popBackStack()
         }

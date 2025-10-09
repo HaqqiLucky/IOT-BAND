@@ -24,6 +24,9 @@ class SettingsFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_settings, container, false)
 
+        // Sembunyikan bottom navbar
+        hideBottomNavBar()
+
         // Inisialisasi views
         initViews(view)
 
@@ -31,6 +34,22 @@ class SettingsFragment : Fragment() {
         setupClickListeners()
 
         return view
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // Tampilkan kembali bottom navbar saat fragment dihancurkan
+        showBottomNavBar()
+    }
+
+    private fun hideBottomNavBar() {
+        // Sembunyikan container navbar (MaterialCardView)
+        activity?.findViewById<View>(R.id.bottom_navbar_main_activity)?.visibility = View.GONE
+    }
+
+    private fun showBottomNavBar() {
+        // Tampilkan container navbar (MaterialCardView)
+        activity?.findViewById<View>(R.id.bottom_navbar_main_activity)?.visibility = View.VISIBLE
     }
 
     private fun initViews(view: View) {
@@ -47,25 +66,26 @@ class SettingsFragment : Fragment() {
             parentFragmentManager.popBackStack()
         }
 
-        // Personal Information
+        // Personal Information - Navigasi ke UpdateSettingsFragment (Edit Profile)
         layoutPersonalInfo.setOnClickListener {
-            Toast.makeText(context, "Membuka Edit Profil", Toast.LENGTH_SHORT).show()
-            // TODO: Navigasi ke fragment Edit Profil
-            // Contoh:
-            // parentFragmentManager.beginTransaction()
-            //     .replace(R.id.fragment_container, EditProfileFragment())
-            //     .addToBackStack(null)
-            //     .commit()
+            try {
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.container, EditProfileFragment())
+                    .addToBackStack("settings")
+                    .commit()
+            } catch (e: Exception) {
+                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                e.printStackTrace()
+            }
         }
 
         // Change Password
         layoutChangePassword.setOnClickListener {
             Toast.makeText(context, "Membuka Change Password", Toast.LENGTH_SHORT).show()
             // TODO: Navigasi ke fragment Change Password
-            // Contoh:
             // parentFragmentManager.beginTransaction()
-            //     .replace(R.id.fragment_container, ChangePasswordFragment())
-            //     .addToBackStack(null)
+            //     .replace(R.id.container, ChangePasswordFragment())
+            //     .addToBackStack("settings")
             //     .commit()
         }
 
@@ -73,10 +93,9 @@ class SettingsFragment : Fragment() {
         layoutLinkedDevices.setOnClickListener {
             Toast.makeText(context, "Membuka Linked Devices", Toast.LENGTH_SHORT).show()
             // TODO: Navigasi ke fragment Linked Devices
-            // Contoh:
             // parentFragmentManager.beginTransaction()
-            //     .replace(R.id.fragment_container, LinkedDevicesFragment())
-            //     .addToBackStack(null)
+            //     .replace(R.id.container, LinkedDevicesFragment())
+            //     .addToBackStack("settings")
             //     .commit()
         }
 

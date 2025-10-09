@@ -9,17 +9,19 @@ import androidx.fragment.app.Fragment
 
 class UserProfileFragment : Fragment() {
 
-    private lateinit var btnSettings: ImageButton   // ubah jadi ImageButton
+    private lateinit var btnSettings: ImageButton
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Hubungkan ke fragment_user_profile.xml
         val view = inflater.inflate(R.layout.fragment_user_profile, container, false)
 
+        // Tampilkan navbar saat di UserProfile
+        showBottomNavBar()
+
         // Inisialisasi button settings
-        btnSettings = view.findViewById(R.id.btnSettings)  // otomatis jadi ImageButton
+        btnSettings = view.findViewById(R.id.btnSettings)
 
         // click listener for button settings
         btnSettings.setOnClickListener {
@@ -29,10 +31,22 @@ class UserProfileFragment : Fragment() {
         return view
     }
 
+    override fun onResume() {
+        super.onResume()
+        // UnHide navbar
+        showBottomNavBar()
+    }
+
+    private fun showBottomNavBar() {
+//        activity?.findViewById<View>(R.id.bottom_navbar_main_activity)?.visibility = View.VISIBLE
+        activity?.findViewById<View>(R.id.bottom_navbar_main_activity)?.visibility = View.VISIBLE
+
+
+    }
+
     private fun navigateToSettings() {
-        // Navigasi ke SettingsFragment
         parentFragmentManager.beginTransaction()
-            .replace(R.id.container, SettingsFragment()) // container id sesuai sama di activity
+            .replace(R.id.container, SettingsFragment())
             .addToBackStack(null)
             .commit()
     }
