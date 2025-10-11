@@ -50,9 +50,9 @@ class MainActivity : AppCompatActivity() {
                         .replace(R.id.container, HomeFragment())
                         .commit()
                 }
-                R.id.heartbeat -> {
+                R.id.history -> {
                     supportFragmentManager.beginTransaction()
-                        .replace(R.id.container, HomeFragment())
+                        .replace(R.id.container, HistoryFragment())
                         .commit()
                 }
                 R.id.profile -> {
