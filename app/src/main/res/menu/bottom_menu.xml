@@ -15,7 +15,7 @@
         app:cnb_iconColor="@color/green_app_theme" />
     <item
         android:id="@+id/history"
-        android:icon="@drawable/heartbeat"
+        android:icon="@drawable/icon_history"
         android:title="Heart rate"
         app:cnb_iconColor="@color/green_app_theme"/>
     <item
