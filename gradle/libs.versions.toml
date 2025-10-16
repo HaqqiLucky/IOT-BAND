@@ -1,21 +1,35 @@
 [versions]
-agp = "8.13.0"
-kotlin = "2.0.21"
-coreKtx = "1.17.0"
+# Existing AndroidX Versions (Anda boleh menggunakan versi tinggi ini)
+agp = "8.1.3" # Menggunakan versi stabil yang umum
+kotlin = "1.9.22" # Menggunakan versi stabil yang umum
+coreKtx = "1.12.0" # Menggunakan versi stabil yang umum
 junit = "4.13.2"
-junitVersion = "1.3.0"
-espressoCore = "3.7.0"
-appcompat = "1.7.1"
-material = "1.13.0"
-activity = "1.10.1"
-constraintlayout = "2.2.1"
-navigation = "2.9.4"
-annotation = "1.9.1"
-lifecycleLivedataKtx = "2.9.3"
-lifecycleViewmodelKtx = "2.9.3"
+junitVersion = "1.1.5" # Menggunakan versi stabil yang umum
+espressoCore = "3.5.1" # Menggunakan versi stabil yang umum
+appcompat = "1.6.1" # Menggunakan versi stabil yang umum
+material = "1.11.0" # Menggunakan versi stabil yang umum
+activity = "1.8.2" # Menggunakan versi stabil yang umum
+constraintlayout = "2.1.4" # Menggunakan versi stabil yang umum
+navigation = "2.7.7" # Menggunakan versi stabil yang umum
+annotation = "1.7.1" # Menggunakan versi stabil yang umum
+lifecycleLivedataKtx = "2.7.0" # Menggunakan versi stabil yang umum
+lifecycleViewmodelKtx = "2.7.0" # Menggunakan versi stabil yang umum
+recyclerview = "1.3.2" # Menggunakan versi stabil yang umum
+
+# 🌟 Tambahan untuk Firebase dan Google Sign-In
+firebaseBom = "32.7.0" # Versi yang Anda gunakan di build.gradle
+playServicesAuth = "21.0.0" # Menggunakan versi stabil yang umum
+
+# 🌟 Tambahan untuk Pustaka Pihak Ketiga (Third-Party Libraries)
+pinview = "1.4.4"
+segmentedButton = "3.1.9"
+circularProgressbar = "3.1.0"
+chipNavigationBar = "1.4.0"
+circleImageView = "3.1.0"
 
 
 [libraries]
+# AndroidX (Existing)
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -29,9 +43,24 @@ androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation
 androidx-annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotation" }
 androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
+androidx-recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
+
+# 🌟 Firebase & Google Sign-In
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx" } # Versi diambil dari BOM
+google-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
+
+# 🌟 Pustaka Pihak Ketiga
+pinview = { group = "io.github.chaosleung", name = "pinview", version.ref = "pinview" }
+segmented-button = { group = "com.github.addisonelliott", name = "SegmentedButton", version.ref = "segmentedButton" }
+circular-progressbar = { group = "com.mikhaellopez", name = "circularprogressbar", version.ref = "circularProgressbar" }
+chip-navigation-bar = { group = "com.github.ismaeldivita", name = "chip-navigation-bar", version.ref = "chipNavigationBar" }
+circle-image-view = { group = "de.hdodenhof", name = "circleimageview", version.ref = "circleImageView" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 androidx-navigation-safeargs = { id = "androidx.navigation.safeargs.kotlin", version.ref = "navigation" }
-
+# 🌟 Tambahan untuk Plugin Google Services
+google-services = { id = "com.google.gms.google-services", version = "4.4.1" } # Versi stabil yang umum
