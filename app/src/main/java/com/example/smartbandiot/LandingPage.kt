@@ -53,18 +53,18 @@ class LandingPage : AppCompatActivity() {
         }
 
 
-        val clickableSpan = object : ClickableSpan() {
-            override fun onClick(widget: View) {
-                val intent = Intent(this@LandingPage, SigninSignout::class.java)
-                intent.putExtra(FRAGMENT_TO_LOAD_KEY, "SIGN_IN")
-                startActivity(intent)
-            }
-        }
+//        val clickableSpan = object : ClickableSpan() {
+//            override fun onClick(widget: View) {
+//                val intent = Intent(this@LandingPage, SigninSignout::class.java)
+//                intent.putExtra(FRAGMENT_TO_LOAD_KEY, "SIGN_IN")
+//                startActivity(intent)
+//            }
+//        }
 
 
         spannableString.setSpan(ngeBold,boldStartIndex, boldEndIndex, 0)
         spannableString.setSpan(underlineSpan, boldStartIndex, boldEndIndex, 0)
-        spannableString.setSpan(clickableSpan, boldStartIndex, boldEndIndex, 0)
+//        spannableString.setSpan(clickableSpan, boldStartIndex, boldEndIndex, 0)
 
 
         // already have acc cuma oppen sans aja, font size kalo bs
@@ -79,8 +79,7 @@ class LandingPage : AppCompatActivity() {
 
 
         binding.getstartedorsignup.setOnClickListener {
-            val intent = Intent(this@LandingPage, SigninSignout::class.java)
-            intent.putExtra(FRAGMENT_TO_LOAD_KEY, "SIGN_UP")
+            val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
 
