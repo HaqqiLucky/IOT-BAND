@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.smartbandiot"
-    compileSdk = 34
+    compileSdk = 36
 
     buildFeatures{
         viewBinding = true
@@ -16,7 +16,7 @@ android {
     defaultConfig {
         applicationId = "com.example.smartbandiot"
         minSdk = 29
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -53,25 +53,20 @@ dependencies {
     implementation(libs.androidx.annotation)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.recyclerview) // Menggunakan alias baru untuk recyclerview
-
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation("io.github.chaosleung:pinview:1.4.4") // buat kotak pin phone verif
+    implementation("com.github.addisonelliott:SegmentedButton:3.1.9") // segmented control ios height weight
+    implementation("com.mikhaellopez:circularprogressbar:3.1.0") // loading bulet
+    implementation("com.github.ismaeldivita:chip-navigation-bar:1.4.0") //navbar di main activity
+    implementation("androidx.recyclerview:recyclerview:1.3.1") //recycleview
+//    implementation(com.github.bumptech.glide:glide:4.16.0) //upload foto buat profil
+    implementation("androidx.recyclerview:recyclerview:1.3.1") //recycleview
+    implementation("de.hdodenhof:circleimageview:3.1.0")
 
-    // 🌟 Firebase
-    implementation(platform(libs.firebase.bom)) // Menggunakan alias BOM
-    implementation(libs.firebase.auth.ktx)
-    implementation(libs.google.services.auth) // Untuk Google Sign-In
+    // firebase login
+    implementation("com.google.android.gms:play-services-auth:21.4.0")
+    implementation("com.google.firebase:firebase-auth:24.0.1")
 
-    // 🌟 Pustaka Pihak Ketiga
-    implementation(libs.pinview)
-    implementation(libs.segmented.button)
-    implementation(libs.circular.progressbar)
-    implementation(libs.chip.navigation.bar)
-    implementation(libs.circle.image.view)
-
-    // Hapus dependensi yang tidak diperlukan
-    // Hapus: implementation("androidx.recyclerview:recyclerview:1.3.1")
-    // Hapus: implementation("com.google.firebase:firebase-auth:24.0.1")
 }

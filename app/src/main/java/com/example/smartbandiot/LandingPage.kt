@@ -20,10 +20,21 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.smartbandiot.databinding.LandingPageBinding
+import com.google.firebase.auth.FirebaseAuth
 
-const val FRAGMENT_TO_LOAD_KEY = "fragment_to_load"
+//const val FRAGMENT_TO_LOAD_KEY = "fragment_to_load"
 class LandingPage : AppCompatActivity() {
     private lateinit var binding: LandingPageBinding
+
+    override fun onStart() {
+        super.onStart()
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null){
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,8 +84,6 @@ class LandingPage : AppCompatActivity() {
         val openSansEndIndex = openSansStartIndex + wordOpenSans.length
         spannableString.setSpan(opensansSpan, openSansStartIndex, openSansEndIndex, 0)
 
-        binding.signIn.text = spannableString
-        binding.signIn.movementMethod = LinkMovementMethod.getInstance() // biar bs di klik
 
         binding.getstartedorsignup.setOnClickListener {
             val intent = Intent(this, LoginActivity::class.java)

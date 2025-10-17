@@ -17,13 +17,13 @@
         android:fontFamily="@font/poppins_semibold"
         android:text="Sign In/Sign Up"
         android:textSize="25.98sp"
-        app:layout_constraintBottom_toTopOf="@+id/cardView"
+        app:layout_constraintBottom_toTopOf="@+id/login"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
+        android:id="@+id/login"
         android:layout_width="359dp"
         android:layout_height="54dp"
         android:layout_gravity="center"

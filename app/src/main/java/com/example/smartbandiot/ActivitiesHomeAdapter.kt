@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.smartbandiot.databinding.ItemChallengeBinding
-import com.example.smartbandiot.databinding.ItemHistoryBinding
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
