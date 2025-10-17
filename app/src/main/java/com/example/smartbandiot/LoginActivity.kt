@@ -2,106 +2,69 @@ package com.example.smartbandiot
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.ImageButton
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.example.smartbandiot.databinding.ActivityLoginBinding
+import com.example.smartbandiot.databinding.ActivityPreferencesBinding
+import com.example.smartbandiot.databinding.FragmentChooseHeightBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 
-
-class LoginActivity : AppCompatActivity() { // Menggunakan LoginActivity sesuai nama class
+class LoginActivity : AppCompatActivity() {
 
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var auth: FirebaseAuth
-
-    // Kode yang akan dieksekusi setelah berhasil atau gagal mengambil akun Google
-    private val googleSignInLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        // Mendapatkan tugas (task) dari intent hasil
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-        try {
-            // Berhasil mendapatkan akun Google
-            val account = task.getResult(ApiException::class.java)
-            // Lanjutkan dengan autentikasi ke Firebase
-            firebaseAuthWithGoogle(account.idToken)
-        } catch (e: ApiException) {
-            // Gagal mendapatkan akun Google
-            Toast.makeText(this, "Login Google Gagal: ${e.message}", Toast.LENGTH_LONG).show()
-        }
-    }
+    private lateinit var binding: ActivityLoginBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        // Menggunakan R.layout.activity_signin_signout sesuai layout Anda
-        setContentView(R.layout.activity_signin_signout)
+        setContentView(R.layout.activity_login)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        // Inisialisasi Firebase Auth
         auth = FirebaseAuth.getInstance()
-
-        // Konfigurasi Google Sign In
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            // Web Client ID ini didapat otomatis (atau dari strings.xml jika manual)
-            .requestIdToken(getString(R.string.default_web_client_id))
+            .requestIdToken(getString(R.string.default_web_client_id)) // ambil dari google-services.json
             .requestEmail()
             .build()
 
-        // Bangun GoogleSignInClient
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
-        // Atur OnClickListener untuk ImageButton Google
-        // ID di XML Anda adalah imageButtonGoogle
-        findViewById<ImageButton>(R.id.imageButtonGoogle).setOnClickListener {
+        binding.login.setOnClickListener {
             signInWithGoogle()
         }
     }
 
-    // Fungsi untuk memulai proses Google Sign-In
-    private fun signInWithGoogle() {
-        val signInIntent = googleSignInClient.signInIntent
-        googleSignInLauncher.launch(signInIntent)
-    }
-
-    // Fungsi untuk mengautentikasi pengguna di Firebase menggunakan kredensial Google
-    private fun firebaseAuthWithGoogle(idToken: String?) {
-        // Buat kredensial Firebase dari ID Token Google
-        val credential = GoogleAuthProvider.getCredential(idToken, null)
-
-        // Autentikasi ke Firebase
-        auth.signInWithCredential(credential)
-            .addOnCompleteListener(this) { task ->
+    private val launcher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        if (task.isSuccessful) {
+            val account = task.result
+            val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+            auth.signInWithCredential(credential).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    // Sign in sukses
                     val user = auth.currentUser
-                    Toast.makeText(this, "Selamat datang ${user?.displayName}!", Toast.LENGTH_SHORT).show()
-
-                    // ✨ NAVIGASI KE ACTIVITY UTAMA
-                    val intent = Intent(this, MainActivity::class.java)
-                    startActivity(intent)
-                    finish() // Tutup Activity login
+                    Toast.makeText(this, "Welcome ${user?.displayName}", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this, PreferencesActivity::class.java))
+                    finish()
                 } else {
-                    // Sign in gagal
-                    Toast.makeText(this, "Autentikasi Firebase Gagal: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Firebase Sign-in Failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
             }
+        } else {
+            Toast.makeText(this, "Google Sign-in Failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+        }
     }
 
-    // ✅ Implementasi Persistence: Periksa apakah pengguna sudah login saat Activity dimulai
-    override fun onStart() {
-        super.onStart()
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            // Pengguna sudah login, langsung navigasi ke Activity utama
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-            finish() // Tutup Activity login agar pengguna tidak bisa kembali
-        }
+
+    private fun signInWithGoogle() {
+        val signInIntent = googleSignInClient.signInIntent
+        launcher.launch(signInIntent)
     }
 }
