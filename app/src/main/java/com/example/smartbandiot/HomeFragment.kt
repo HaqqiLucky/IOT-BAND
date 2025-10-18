@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.smartbandiot.databinding.FragmentChooseTrainingLevelBinding
 import com.example.smartbandiot.databinding.FragmentHomeBinding
 import com.google.firebase.auth.FirebaseAuth
 import java.time.LocalTime

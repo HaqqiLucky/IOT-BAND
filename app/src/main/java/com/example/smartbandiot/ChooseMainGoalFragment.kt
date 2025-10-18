@@ -1,14 +1,15 @@
 package com.example.smartbandiot
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.smartbandiot.databinding.FragmentChooseGenderBinding
 import com.example.smartbandiot.databinding.FragmentChooseMainGoalBinding
-import com.example.smartbandiot.databinding.FragmentChooseTrainingLevelBinding
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -25,6 +26,8 @@ class ChooseMainGoalFragment : Fragment() {
     private var _binding: FragmentChooseMainGoalBinding? = null
 
     private val binding get() = _binding!!
+
+    private var selectedGoal: String? = null
     private var param1: String? = null
     private var param2: String? = null
 
@@ -43,17 +46,24 @@ class ChooseMainGoalFragment : Fragment() {
         _binding = FragmentChooseMainGoalBinding.inflate(inflater, container, false)
 
         binding.continu.isEnabled = false
-        val main_goals = listOf(binding.keepFit, binding.loseWeight)
+        val main_goals = listOf(binding.keepFit)
         binding.continu.isEnabled = false
-        main_goals.forEach { gender ->
-            gender.setOnClickListener {
+
+        main_goals.forEach { goal ->
+            goal.setOnClickListener {
                 main_goals.forEach {
                     it.isChecked = false
                     it.isSelected = false
                 }
-                gender.isSelected = true
-                gender.isChecked = true
+
+                goal.isSelected = true
+                goal.isChecked = true
                 binding.continu.isEnabled = true
+
+                selectedGoal = when (goal.id){
+                    binding.keepFit.id -> "Keep Fit"
+                    else -> ""
+                }
             }
         }
         return binding.root
@@ -63,6 +73,9 @@ class ChooseMainGoalFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.continu.setOnClickListener {
+            val viewModel = ViewModelProvider(requireActivity()).get(PreferencesSharedViewModel::class.java)
+            viewModel.goal = selectedGoal.toString()
+            Log.d("Goal", "Pov Viewmodel: ${viewModel.goal}, pov goalfragment.kt: $selectedGoal")
             findNavController().navigate(R.id.maintoheight)
         }
     }

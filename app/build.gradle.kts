@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.androidx.annotation)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
+//    implementation(libs.firebase.database.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -65,8 +66,16 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.1") //recycleview
     implementation("de.hdodenhof:circleimageview:3.1.0")
 
+    // bombayah
+    implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
+
     // firebase login
     implementation("com.google.android.gms:play-services-auth:21.4.0")
     implementation("com.google.firebase:firebase-auth:24.0.1")
+
+    // firebase realtime database
+    implementation("com.google.firebase:firebase-database")
+
+
 
 }

@@ -25,47 +25,6 @@ tools:context=".ChooseHeightFragment">
         android:gravity="center"
         android:text="Select height" />
 
-    <com.addisonelliott.segmentedbutton.SegmentedButtonGroup
-        android:id="@+id/buttonGroup"
-        android:layout_width="242.49dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_margin="4dp"
-        android:background="#F1F4F8"
-        app:borderWidth="5dp"
-        app:selectedBorderColor="#F1F4F8"
-        app:dividerPadding="10dp"
-        app:borderColor="#F1F4F8"
-        app:radius="30dp">
-
-        <com.addisonelliott.segmentedbutton.SegmentedButton
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:fontFamily="@font/poppins_extrabold"
-            android:padding="10dp"
-            android:background="#F1F4F8"
-            app:selectedBackground="#FFFFFF"
-            app:selectedTextColor="#404B52"
-            app:text="Feet"
-            app:rounded="false"
-            app:textColor="@color/black" />
-
-        <com.addisonelliott.segmentedbutton.SegmentedButton
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="#F1F4F8"
-            app:selectedBackground="#FFFFFF"
-            android:fontFamily="@font/poppins_extrabold"
-            android:padding="10dp"
-            app:selectedTextColor="#404B52"
-            app:text="Centimeter"
-            app:rounded="false"
-            app:textColor="@color/black" />
-
-    </com.addisonelliott.segmentedbutton.SegmentedButtonGroup>
-
     <LinearLayout
         android:layout_width="150dp"
         android:layout_height="62dp"
@@ -86,16 +45,14 @@ tools:context=".ChooseHeightFragment">
             android:maxLines="1"
             android:textColor="@color/black"
             android:padding="10dp"/>
-
-
         <TextView
-            android:id="@+id/ftcm"
+            android:id="@+id/cm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginLeft="5dp"
             android:fontFamily="@font/opensans_regular"
-            android:text="ft"
+            android:text="cm"
             android:textSize="15.4sp" />
     </LinearLayout>
 
@@ -117,3 +74,49 @@ tools:context=".ChooseHeightFragment">
     app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+<!--segmented-->
+
+
+
+<!--<com.addisonelliott.segmentedbutton.SegmentedButtonGroup-->
+<!--android:id="@+id/buttonGroup"-->
+<!--android:layout_width="242.49dp"-->
+<!--android:layout_height="wrap_content"-->
+<!--android:layout_gravity="center_horizontal"-->
+<!--android:layout_margin="4dp"-->
+<!--android:background="#F1F4F8"-->
+<!--app:borderWidth="5dp"-->
+<!--app:selectedBorderColor="#F1F4F8"-->
+<!--app:dividerPadding="10dp"-->
+<!--app:borderColor="#F1F4F8"-->
+<!--app:radius="30dp">-->
+
+<!--<com.addisonelliott.segmentedbutton.SegmentedButton-->
+<!--    android:layout_width="0dp"-->
+<!--    android:layout_height="match_parent"-->
+<!--    android:layout_weight="1"-->
+<!--    android:fontFamily="@font/poppins_extrabold"-->
+<!--    android:padding="10dp"-->
+<!--    android:background="#F1F4F8"-->
+<!--    app:selectedBackground="#FFFFFF"-->
+<!--    app:selectedTextColor="#404B52"-->
+<!--    app:text="Feet"-->
+<!--    app:rounded="false"-->
+<!--    app:textColor="@color/black" />-->
+
+<!--<com.addisonelliott.segmentedbutton.SegmentedButton-->
+<!--    android:layout_width="0dp"-->
+<!--    android:layout_height="match_parent"-->
+<!--    android:layout_weight="1"-->
+<!--    android:background="#F1F4F8"-->
+<!--    app:selectedBackground="#FFFFFF"-->
+<!--    android:fontFamily="@font/poppins_extrabold"-->
+<!--    android:padding="10dp"-->
+<!--    app:selectedTextColor="#404B52"-->
+<!--    app:text="Centimeter"-->
+<!--    app:rounded="false"-->
+<!--    app:textColor="@color/black" />-->
+
+<!--</com.addisonelliott.segmentedbutton.SegmentedButtonGroup>-->

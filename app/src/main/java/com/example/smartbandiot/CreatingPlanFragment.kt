@@ -2,11 +2,18 @@ package com.example.smartbandiot
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
 import com.example.smartbandiot.databinding.FragmentCreatingPlanBinding
+import com.example.smartbandiot.model.User
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.database
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -32,6 +39,8 @@ class CreatingPlanFragment : Fragment() {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+        saveUserDataToFirebase()
+        Log.d("CreatingPLanFragment","Sampe sini harusnya udah masuk ke database")
     }
 
     override fun onCreateView(
@@ -60,11 +69,34 @@ class CreatingPlanFragment : Fragment() {
             startActivity(intent)
             requireActivity().finish() // g bs balik lagi blee
         }
+    }
 
+    private fun saveUserDataToFirebase() {
+        val viewModel = ViewModelProvider(requireActivity())[PreferencesSharedViewModel::class.java]
+        val auth = FirebaseAuth.getInstance()
+        val uid = auth.currentUser?.uid ?: return
 
-//        if (binding.persenanloading.text.toString() == "100%"){
+        val user = User(
+            uid = uid,
+            name = auth.currentUser?.displayName ?: "",
+            weight = viewModel.weight,
+            height = viewModel.height,
+            age = viewModel.age,
+            profileImagePath = auth.currentUser?.photoUrl.toString(),
+            email = auth.currentUser?.email ?: "",
+            gender = viewModel.gender,
+            goal = viewModel.goal
+        )
 
-//        }
+        val database = Firebase.database
+        val myRef = database.getReference("users_personal_preferences")
+        myRef.child(uid).setValue(user)
+            .addOnSuccessListener {
+                Log.d("user_personal_preferences","mi sukses")
+            }
+            .addOnFailureListener { e ->
+                Log.e("user_personal_preferences","ya elah ga masuk")
+            }
     }
 
     companion object {

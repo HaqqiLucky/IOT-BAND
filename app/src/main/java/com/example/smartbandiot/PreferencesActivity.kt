@@ -52,7 +52,7 @@ class PreferencesActivity : AppCompatActivity() {
                     binding.buttonback.visibility = View.VISIBLE
                     binding.skip.visibility = View.VISIBLE
                 }
-                R.id.Step5traininglevel -> {
+                R.id.Step5age -> {
                     binding.step.text = "Step 5 of 5"
                     binding.step.visibility = View.VISIBLE
                     binding.buttonback.visibility = View.VISIBLE
@@ -86,8 +86,8 @@ class PreferencesActivity : AppCompatActivity() {
                 R.id.Step1Gender -> navController.navigate(R.id.Step2MainGoal)
                 R.id.Step2MainGoal -> navController.navigate(R.id.Step3Height)
                 R.id.Step3Height -> navController.navigate(R.id.Step4Weight)
-                R.id.Step4Weight -> navController.navigate(R.id.Step5traininglevel)
-                R.id.Step5traininglevel -> navController.navigate(R.id.CreatingPlan)
+                R.id.Step4Weight -> navController.navigate(R.id.Step5age)
+                R.id.Step5age -> navController.navigate(R.id.CreatingPlan)
             }
         }
 //
