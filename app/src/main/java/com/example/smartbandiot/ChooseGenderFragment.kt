@@ -1,10 +1,12 @@
 package com.example.smartbandiot
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.smartbandiot.databinding.FragmentChooseGenderBinding
 
@@ -23,6 +25,7 @@ class ChooseGenderFragment : Fragment() {
     private var _binding: FragmentChooseGenderBinding? = null
 
     private val binding get() = _binding!!
+    private var selectedGender : String? = null
 
     // TODO: Rename and change types of parameters
     private var param1: String? = null
@@ -48,22 +51,32 @@ class ChooseGenderFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val genders = listOf(binding.man, binding.neutral, binding.woman)
-
+        val genders = listOf(binding.man, binding.woman)
         binding.continu.isEnabled = false
+
         genders.forEach { gender ->
             gender.setOnClickListener {
                 genders.forEach {
                     it.isChecked = false
                     it.isSelected = false
                 }
-                gender.isSelected = true
+
                 gender.isChecked = true
+                gender.isSelected = true
                 binding.continu.isEnabled = true
+
+                selectedGender = when (gender.id) {
+                    binding.man.id -> "Male"
+                    binding.woman.id -> "Female"
+                    else -> ""
+                }
             }
         }
 
         binding.continu.setOnClickListener {
+            val viewModel = ViewModelProvider(requireActivity()).get(PreferencesSharedViewModel::class.java)
+            viewModel.gender = selectedGender.toString()
+            Log.d("Gender", "Pov Viewmodel: ${viewModel.gender}, pov choosegenderfragment.kt: $selectedGender")
             findNavController().navigate(R.id.gendertomain)
         }
     }

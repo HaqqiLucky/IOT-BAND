@@ -1,14 +1,16 @@
 package com.example.smartbandiot
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.example.smartbandiot.databinding.FragmentChooseTrainingLevelBinding
-
+import com.example.smartbandiot.databinding.FragmentAgeBinding
+import com.example.smartbandiot.databinding.FragmentChooseHeightBinding
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -17,23 +19,18 @@ private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
- * Use the [ChooseTrainingLevelFragment.newInstance] factory method to
+ * Use the [AgeFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class ChooseTrainingLevelFragment : Fragment() {
-
-    private var _binding: FragmentChooseTrainingLevelBinding? = null
-    private val binding get() = _binding!!
+class AgeFragment : Fragment() {
     // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private var _binding: FragmentAgeBinding? = null
+
+    private val binding get() = _binding!!
+    private var getAge: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
     }
 
     override fun onCreateView(
@@ -41,32 +38,7 @@ class ChooseTrainingLevelFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        _binding = FragmentChooseTrainingLevelBinding.inflate(inflater, container, false)
-
-
-//       ini untuk semua material card view
-
-        val cardo_sengko = listOf(
-            binding.beginer,
-            binding.irregularTraining,
-            binding.medium,
-            binding.advance
-        )
-
-        binding.continu.isEnabled = false
-        cardo_sengko.forEach { gender ->
-            gender.setOnClickListener {
-                cardo_sengko.forEach {
-                    it.isChecked = false
-                    it.isSelected = false
-                }
-                gender.isSelected = true
-                gender.isChecked = true
-                binding.continu.isEnabled = true
-            }
-        }
-
-
+        _binding = FragmentAgeBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -74,8 +46,17 @@ class ChooseTrainingLevelFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.continu.setOnClickListener {
-            findNavController().navigate(R.id.trainingtocreating)
+            val viewModel = ViewModelProvider(requireActivity()).get(PreferencesSharedViewModel::class.java)
+            viewModel.age = binding.editTextAge.text.toString().toInt()
+            Log.d("Age", "Pov Viewmodel: ${viewModel.age}")
+            findNavController().navigate(R.id.agetocreating)
         }
+
+        binding.continu.isEnabled =false
+        binding.editTextAge.addTextChangedListener { text->
+            binding.continu.isEnabled = !text.isNullOrBlank()
+        }
+
     }
 
     companion object {
@@ -85,12 +66,12 @@ class ChooseTrainingLevelFragment : Fragment() {
          *
          * @param param1 Parameter 1.
          * @param param2 Parameter 2.
-         * @return A new instance of fragment ChooseTrainingLevelFragment.
+         * @return A new instance of fragment AgeFragment.
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-            ChooseTrainingLevelFragment().apply {
+            AgeFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)

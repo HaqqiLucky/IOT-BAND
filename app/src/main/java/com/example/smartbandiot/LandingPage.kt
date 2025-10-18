@@ -12,6 +12,7 @@ import android.text.style.ClickableSpan
 import android.text.style.StyleSpan
 import android.text.style.TypefaceSpan
 import android.text.style.UnderlineSpan
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -20,7 +21,9 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.smartbandiot.databinding.LandingPageBinding
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.database
 
 //const val FRAGMENT_TO_LOAD_KEY = "fragment_to_load"
 class LandingPage : AppCompatActivity() {
@@ -28,13 +31,36 @@ class LandingPage : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        if (currentUser != null){
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-            finish()
+        val auth = FirebaseAuth.getInstance()
+        val currentUser = auth.currentUser
+
+        if (currentUser != null) {
+            val uid = currentUser.uid
+
+            val database = Firebase.database
+            val myRef = database
+                .getReference("users_personal_preferences")
+                .child(uid)
+
+            // cek data preferensi user
+            myRef.get()
+                .addOnSuccessListener { snapshot ->
+                    if (snapshot.exists()) {
+                        val intent = Intent(this, MainActivity::class.java)
+                        startActivity(intent)
+                    } else {
+                        val intent = Intent(this, PreferencesActivity::class.java)
+                        startActivity(intent)
+                    }
+                    finish() // supaya user gak bisa balik ke login
+                }
+                .addOnFailureListener {
+                    // Kalau gagal ambil data (misal jaringan error)
+                    Log.e("Landing page", "gagal ngecek data exist apa engga")
+                }
         }
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
