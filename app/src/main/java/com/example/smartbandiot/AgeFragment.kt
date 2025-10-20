@@ -1,12 +1,16 @@
 package com.example.smartbandiot
 
-import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.smartbandiot.databinding.FragmentSignupBinding
+import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import com.example.smartbandiot.databinding.FragmentAgeBinding
+import com.example.smartbandiot.databinding.FragmentChooseHeightBinding
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -15,50 +19,44 @@ private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
- * Use the [SignupFragment.newInstance] factory method to
+ * Use the [AgeFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class SignupFragment : Fragment() {
+class AgeFragment : Fragment() {
+    // TODO: Rename and change types of parameters
+    private var _binding: FragmentAgeBinding? = null
 
-    private var _binding: FragmentSignupBinding? = null
-    // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
-
-    private var param1: String? = null
-    private var param2: String? = null
+    private var getAge: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentSignupBinding.inflate(inflater, container, false)
+        // Inflate the layout for this fragment
+        _binding = FragmentAgeBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (activity as? SigninSignout)?.setupTextViewForNavigation(false)
 
-        val checkbox = binding.checkboxTerms
-        val buttonsingup = binding.signup
-
-        buttonsingup.isEnabled = false
-        checkbox.setOnCheckedChangeListener { _, isChecked ->
-            // Jika CheckBox dicentang, aktifkan tombol
-            buttonsingup.isEnabled = isChecked
+        binding.continu.setOnClickListener {
+            val viewModel = ViewModelProvider(requireActivity()).get(PreferencesSharedViewModel::class.java)
+            viewModel.age = binding.editTextAge.text.toString().toInt()
+            Log.d("Age", "Pov Viewmodel: ${viewModel.age}")
+            findNavController().navigate(R.id.agetocreating)
         }
 
-        binding.signup.setOnClickListener {
-            startActivity(Intent(requireActivity(), PhoneVerivicationActivity::class.java))
+        binding.continu.isEnabled =false
+        binding.editTextAge.addTextChangedListener { text->
+            binding.continu.isEnabled = !text.isNullOrBlank()
         }
+
     }
 
     companion object {
@@ -68,12 +66,12 @@ class SignupFragment : Fragment() {
          *
          * @param param1 Parameter 1.
          * @param param2 Parameter 2.
-         * @return A new instance of fragment SignupFragment.
+         * @return A new instance of fragment AgeFragment.
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-            SignupFragment().apply {
+            AgeFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)

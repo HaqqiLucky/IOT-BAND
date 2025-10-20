@@ -38,16 +38,16 @@
         android:label="weight"
         tools:layout="@layout/fragment_choose_weight" >
         <action
-            android:id="@+id/weighttotraining"
-            app:destination="@id/Step5traininglevel" />
+            android:id="@+id/weightToAge"
+            app:destination="@id/Step5age" />
     </fragment>
     <fragment
-        android:id="@+id/Step5traininglevel"
-        android:name="com.example.smartbandiot.ChooseTrainingLevelFragment"
-        android:label="goal_weight"
-        tools:layout="@layout/fragment_choose_training_level" >
+        android:id="@+id/Step5age"
+        android:name="com.example.smartbandiot.AgeFragment"
+        android:label="age_level"
+        tools:layout="@layout/fragment_age" >
         <action
-            android:id="@+id/trainingtocreating"
+            android:id="@+id/agetocreating"
             app:destination="@id/CreatingPlan" />
     </fragment>
 

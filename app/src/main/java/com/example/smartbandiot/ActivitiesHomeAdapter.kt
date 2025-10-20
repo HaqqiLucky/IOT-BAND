@@ -3,7 +3,7 @@ package com.example.smartbandiot
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.smartbandiot.databinding.ItemHistoryBinding
+import com.example.smartbandiot.databinding.ItemChallengeBinding
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter
 class ActivitiesHomeAdapter (private val dataList: List<HistoryActivityItemData>):
     RecyclerView.Adapter<ActivitiesHomeAdapter.BindingViewHolder>(){
 
-    inner class BindingViewHolder(private val binding: ItemHistoryBinding) :
+    inner class BindingViewHolder(private val binding: ItemChallengeBinding) :
             RecyclerView.ViewHolder(binding.root){
             fun bind(item: HistoryActivityItemData){
                 binding.date.text = item.formattedDate
@@ -19,11 +19,10 @@ class ActivitiesHomeAdapter (private val dataList: List<HistoryActivityItemData>
                 binding.time.text = item.formattedTime
                 binding.pace.text = item.formattedPace
             }
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingViewHolder {
-        val binding = ItemHistoryBinding.inflate(
+        val binding = ItemChallengeBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false
@@ -40,7 +39,4 @@ class ActivitiesHomeAdapter (private val dataList: List<HistoryActivityItemData>
     override fun getItemCount(): Int {
         return dataList.size
     }
-
-
-
 }

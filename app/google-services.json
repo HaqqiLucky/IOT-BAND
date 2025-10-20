@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1051226416709",
+    "firebase_url": "https://smartbandforteens-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "smartbandforteens",
+    "storage_bucket": "smartbandforteens.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1051226416709:android:1fdd616b80db5ac048652c",
+        "android_client_info": {
+          "package_name": "com.example.smartbandiot"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1051226416709-ki0nn1hc7ciof90o7b69hqpu52dv17pk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.smartbandiot",
+            "certificate_hash": "8b6cf798867fdc1a828a705b495563ac5da604cc"
+          }
+        },
+        {
+          "client_id": "1051226416709-9kvm4tnmef9mavgah5e6lqjsfa5e71es.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAnDc-ctb2t0aE-QHCdrLBvv1U1bpY1thA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1051226416709-9kvm4tnmef9mavgah5e6lqjsfa5e71es.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
