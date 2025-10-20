@@ -4,21 +4,30 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.smartbandiot.databinding.ItemChallengeBinding
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
-class ActivitiesHomeAdapter (private val dataList: List<HistoryActivityItemData>):
-    RecyclerView.Adapter<ActivitiesHomeAdapter.BindingViewHolder>(){
+class ActivitiesHomeAdapter(
+    private val dataList: List<HistoryActivityItemData>
+) : RecyclerView.Adapter<ActivitiesHomeAdapter.BindingViewHolder>() {
 
-    inner class BindingViewHolder(private val binding: ItemChallengeBinding) :
-            RecyclerView.ViewHolder(binding.root){
-            fun bind(item: HistoryActivityItemData){
-                binding.date.text = item.formattedDate
-                binding.title.text = item.title
-                binding.time.text = item.formattedTime
-                binding.pace.text = item.formattedPace
+    inner class BindingViewHolder(val binding: ItemChallengeBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(item: HistoryActivityItemData) {
+            binding.date.text = item.formattedDate
+            binding.title.text = item.title
+            binding.time.text = item.formattedTime
+            binding.pace.text = item.formattedPace
+
+            // ✅ Tambahkan event klik pada CardView untuk pindah ke JoggingFragment
+            binding.root.setOnClickListener {
+                val fragment = JoggingFragment()
+                val activity = binding.root.context as MainActivity
+                activity.supportFragmentManager.beginTransaction()
+                    .replace(R.id.container, fragment)
+                    .addToBackStack(null)
+                    .commit()
             }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingViewHolder {
@@ -29,14 +38,11 @@ class ActivitiesHomeAdapter (private val dataList: List<HistoryActivityItemData>
         )
         return BindingViewHolder(binding)
     }
-    // 3. onBindViewHolder: Menghubungkan data dengan ViewHolder
+
     override fun onBindViewHolder(holder: BindingViewHolder, position: Int) {
         val currentItem = dataList[position]
         holder.bind(currentItem)
     }
 
-    // 4. getItemCount: Mengembalikan jumlah total item
-    override fun getItemCount(): Int {
-        return dataList.size
-    }
+    override fun getItemCount(): Int = dataList.size
 }

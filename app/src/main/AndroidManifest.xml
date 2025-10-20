@@ -32,9 +32,6 @@
             android:name=".PhoneVerivicationActivity"
             android:exported="false" />
         <activity
-            android:name=".SigninSignout"
-            android:exported="false" />
-        <activity
             android:name=".LandingPage"
             android:exported="true">
             <intent-filter>
