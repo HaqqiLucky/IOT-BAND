@@ -63,4 +63,7 @@ dependencies {
 //    implementation(com.github.bumptech.glide:glide:4.16.0) //upload foto buat profil
     implementation("androidx.recyclerview:recyclerview:1.3.1") //recycleview
     implementation("de.hdodenhof:circleimageview:3.1.0")
+    implementation("org.maplibre.gl:android-sdk:11.5.1")//maps
+
+
 }

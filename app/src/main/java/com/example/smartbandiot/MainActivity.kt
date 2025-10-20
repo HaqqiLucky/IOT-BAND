@@ -60,6 +60,11 @@ class MainActivity : AppCompatActivity() {
                         .replace(R.id.container, UserProfileFragment())
                         .commit()
                 }
+                R.id.activity -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.container, JoggingFragment())
+                        .commit()
+                }
             }
         }
     }
