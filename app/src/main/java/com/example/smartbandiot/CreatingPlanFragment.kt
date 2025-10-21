@@ -14,6 +14,11 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.database
+import java.io.File
+import java.time.Year
+import java.time.YearMonth
+import java.time.temporal.ChronoUnit
+import kotlin.math.pow
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -29,6 +34,12 @@ class CreatingPlanFragment : Fragment() {
 
     private var _binding: FragmentCreatingPlanBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var auth: FirebaseAuth
+    private val realtimeDatabase = Firebase.database
+    private val userRef = realtimeDatabase.getReference("users_personal_preferences")
+
+
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -41,6 +52,7 @@ class CreatingPlanFragment : Fragment() {
         }
         saveUserDataToFirebase()
         Log.d("CreatingPLanFragment","Sampe sini harusnya udah masuk ke database")
+
     }
 
     override fun onCreateView(
@@ -81,16 +93,16 @@ class CreatingPlanFragment : Fragment() {
             name = auth.currentUser?.displayName ?: "",
             weight = viewModel.weight,
             height = viewModel.height,
-            age = viewModel.age,
+            birthYYYYmm = viewModel.birthYYYYmm,
             profileImagePath = auth.currentUser?.photoUrl.toString(),
             email = auth.currentUser?.email ?: "",
             gender = viewModel.gender,
             goal = viewModel.goal
         )
 
-        val database = Firebase.database
-        val myRef = database.getReference("users_personal_preferences")
-        myRef.child(uid).setValue(user)
+//        val database = Firebase.database
+//        val myRef = database.getReference("users_personal_preferences")
+        userRef.child(uid).setValue(user)
             .addOnSuccessListener {
                 Log.d("user_personal_preferences","mi sukses")
             }
@@ -98,6 +110,115 @@ class CreatingPlanFragment : Fragment() {
                 Log.e("user_personal_preferences","ya elah ga masuk")
             }
     }
+
+    private fun rulebase(){
+//        val viewModel = ViewModelProvider(requireActivity())[PreferencesSharedViewModel::class.java]
+//        val dfRef = Firebase.
+//        val auth = FirebaseAuth.getInstance()
+
+        userRef.get().addOnSuccessListener { snapshot ->
+            if (snapshot.exists()){
+                val userPreferencesfromFirebasehehe = snapshot.getValue(User::class.java)
+                if (userPreferencesfromFirebasehehe != null) {
+
+                    val ageBelumDipisah =
+                        userPreferencesfromFirebasehehe.birthYYYYmm // misal 200511
+                    val birthYear = ageBelumDipisah.substring(0, 4).toInt() // 2005
+                    val birthMonth = ageBelumDipisah.substring(4, 6).toInt() // 11
+                    val bulanuserlahir = YearMonth.of(birthYear, birthMonth)
+                    val bulanSekarang = YearMonth.now()
+                    val kalkulasiBulanUserDariLahir =
+                        ChronoUnit.MONTHS.between(bulanuserlahir, bulanSekarang)
+                    Log.d(
+                        "CreatingPlan",
+                        "umur sekarang dengan satuan bulan $kalkulasiBulanUserDariLahir"
+                    )
+
+                    val tahunSekarang = Year.now()
+                    val birthYear2 = Year.of(birthYear)
+                    val age = ChronoUnit.YEARS.between(birthYear2, tahunSekarang)
+                    Log.d("CreatingPlan", "umur sekarang dengan satuan tahun $age")
+
+                    fun bmi(): String {
+                        Log.d("CreatingPlan", "Ini adalah bmi fungsi init")
+                        val weight = userPreferencesfromFirebasehehe.weight
+                        val height = userPreferencesfromFirebasehehe.height
+                        val sex = userPreferencesfromFirebasehehe.gender
+
+                        if (age >= 20) {
+                            val kalkulasi = weight / (height * height)
+                            val kategori = when (kalkulasi) {
+                                in Double.NEGATIVE_INFINITY..18.4 -> "Underweight"
+                                in 18.5..24.9 -> "Normal"
+                                in 25.0..29.9 -> "Overweight"
+                                else -> "Obese"
+                            }
+                            Log.d("CreatingPlan", "ini age 20 > dapet kategori $kategori")
+                            return kategori
+                        } else {
+                            val bmibocilblmFix = weight / (height * height)
+                            // ngambil el em es
+                            if (sex == "Male") {
+                                val L = 1
+                                val M = 2
+                                val S = 3
+                                val dataForBoy = File("bmi-boys-z-who-2007-exp.csv")
+                                    .readLines()
+                                    .find {
+                                        it.split(',').first()
+                                            .trim() == kalkulasiBulanUserDariLahir.toString()
+                                    }
+                                    ?.split(',')
+                                    ?.slice(listOf(L, M, S))
+
+                                // LMS Equation
+                                val z_score = ((bmibocilblmFix / M).pow(L) - 1) / (L * S)
+                                val kategoriBocil = when (z_score) {
+                                    in Double.NEGATIVE_INFINITY..-2.0 -> "Underweight"
+                                    in -2.0..1.0 -> "Normal"
+                                    in 1.0..2.0 -> "Overweight"
+                                    else -> "Obese"
+                                }
+                                Log.d("CreatingPlan", "ini age < 20 boy dapet kategori $kategoriBocil")
+                                return kategoriBocil
+                            } else { // ini pricess
+                                val L = 1
+                                val M = 2
+                                val S = 3
+                                val dataForGirl = File("bmi-boys-z-who-2007-exp.csv")
+                                    .readLines()
+                                    .find {
+                                        it.split(',').first()
+                                            .trim() == kalkulasiBulanUserDariLahir.toString()
+                                    }
+                                    ?.split(',')
+                                    ?.slice(listOf(L, M, S))
+
+                                // LMS Equation
+                                val z_score = ((bmibocilblmFix / M).pow(L) - 1) / (L * S)
+                                val kategoriBocil = when (z_score) {
+                                    in Double.NEGATIVE_INFINITY..-2.0 -> "Underweight"
+                                    in -2.0..1.0 -> "Normal"
+                                    in 1.0..2.0 -> "Overweight"
+                                    else -> "Obese"
+                                }
+                                Log.d("CreatingPlan", "ini age < 20 girl dapet kategori $kategoriBocil")
+                                return kategoriBocil
+                            }
+                        }
+                    }
+                    val hrMax = 200 - age
+                    val bmi = bmi()
+
+                }
+            }
+        }
+//        val hrMax = 200 - viewModel.age
+    }
+
+
+
+
 
     companion object {
         /**
@@ -119,3 +240,48 @@ class CreatingPlanFragment : Fragment() {
             }
     }
 }
+
+
+// rulebase dr draw io
+
+
+
+
+//Underweight
+//Less than 18.5
+
+//Healthy Weight
+//18.5 to less than 25
+
+//Overweight
+//25 to less than 30
+
+//Obesity
+//30 or greater
+
+//Class 1 Obesity
+//30 to less than 35
+
+//Class 2 Obesity
+//35 to less than 40
+
+//Class 3 Obesity
+//(Severe Obesity)
+//40 or greater
+
+// source =  https://www.cdc.gov/bmi/adult-calculator/bmi-categories.html
+
+
+
+// gender : gender was found to be an important factor influencing endurance performance
+//source : https://dl.acm.org/doi/10.1145/3732299.3732334#sec-5
+
+
+//height & weight source : https://dl.acm.org/doi/10.1145/3732299.3732334#sec-5
+//The influence of height, weight and BMI: Height and weight, as basic indicators of body shape,
+//have a direct impact on endurance performance. Higher BMI is negatively correlated with endurance
+//performance, indicating that overweight and obese individuals typically have poorer endurance
+//performance. This highlights the importance of weight control in improving endurance performance.
+
+//makin gede bmi kalo besarannya itu isinya lemak semua maka bakal cpt capek juga orgnya kalo lari
+//        kalo gedenya karena muscle beda lagi mesti kuat kuat aja larinya
