@@ -78,6 +78,8 @@
                     android:layout_width="97.78dp"
                     android:layout_height="62dp"
                     android:hint="1999"
+                    android:maxLength="4"
+                    android:inputType="number"
                     android:textAlignment="center"
                     android:background="@drawable/spinner_age"/>
 

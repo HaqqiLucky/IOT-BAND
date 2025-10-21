@@ -15,8 +15,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.database
 import java.io.File
+import java.time.Year
 import java.time.YearMonth
 import java.time.temporal.ChronoUnit
+import kotlin.math.pow
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -50,6 +52,7 @@ class CreatingPlanFragment : Fragment() {
         }
         saveUserDataToFirebase()
         Log.d("CreatingPLanFragment","Sampe sini harusnya udah masuk ke database")
+
     }
 
     override fun onCreateView(
@@ -90,7 +93,7 @@ class CreatingPlanFragment : Fragment() {
             name = auth.currentUser?.displayName ?: "",
             weight = viewModel.weight,
             height = viewModel.height,
-            age = viewModel.age,
+            birthYYYYmm = viewModel.birthYYYYmm,
             profileImagePath = auth.currentUser?.photoUrl.toString(),
             email = auth.currentUser?.email ?: "",
             gender = viewModel.gender,
@@ -116,18 +119,33 @@ class CreatingPlanFragment : Fragment() {
         userRef.get().addOnSuccessListener { snapshot ->
             if (snapshot.exists()){
                 val userPreferencesfromFirebasehehe = snapshot.getValue(User::class.java)
-                if (userPreferencesfromFirebasehehe != null){
+                if (userPreferencesfromFirebasehehe != null) {
 
-                    val hrMax = 200 - userPreferencesfromFirebasehehe.age
-//                    val bmi = userPreferencesfromFirebasehehe.weight / userPreferencesfromFirebasehehe.height * userPreferencesfromFirebasehehe.height
+                    val ageBelumDipisah =
+                        userPreferencesfromFirebasehehe.birthYYYYmm // misal 200511
+                    val birthYear = ageBelumDipisah.substring(0, 4).toInt() // 2005
+                    val birthMonth = ageBelumDipisah.substring(4, 6).toInt() // 11
+                    val bulanuserlahir = YearMonth.of(birthYear, birthMonth)
+                    val bulanSekarang = YearMonth.now()
+                    val kalkulasiBulanUserDariLahir =
+                        ChronoUnit.MONTHS.between(bulanuserlahir, bulanSekarang)
+                    Log.d(
+                        "CreatingPlan",
+                        "umur sekarang dengan satuan bulan $kalkulasiBulanUserDariLahir"
+                    )
+
+                    val tahunSekarang = Year.now()
+                    val birthYear2 = Year.of(birthYear)
+                    val age = ChronoUnit.YEARS.between(birthYear2, tahunSekarang)
+                    Log.d("CreatingPlan", "umur sekarang dengan satuan tahun $age")
 
                     fun bmi(): String {
-                        val age = userPreferencesfromFirebasehehe.age
+                        Log.d("CreatingPlan", "Ini adalah bmi fungsi init")
                         val weight = userPreferencesfromFirebasehehe.weight
                         val height = userPreferencesfromFirebasehehe.height
                         val sex = userPreferencesfromFirebasehehe.gender
 
-                        if (age >= 20 ){
+                        if (age >= 20) {
                             val kalkulasi = weight / (height * height)
                             val kategori = when (kalkulasi) {
                                 in Double.NEGATIVE_INFINITY..18.4 -> "Underweight"
@@ -135,44 +153,70 @@ class CreatingPlanFragment : Fragment() {
                                 in 25.0..29.9 -> "Overweight"
                                 else -> "Obese"
                             }
+                            Log.d("CreatingPlan", "ini age 20 > dapet kategori $kategori")
                             return kategori
                         } else {
-                            val kalkulasiawal = weight / (height * height)
-                            // LMS EQUATION
-                            if (sex == "Male"){
-                                val dataForBoy = "bmi-boys-z-who-2007-exp.csv"
-                                File(dataForBoy).forEachLine { line ->
-                                    val columns = line.split(",")
+                            val bmibocilblmFix = weight / (height * height)
+                            // ngambil el em es
+                            if (sex == "Male") {
+                                val L = 1
+                                val M = 2
+                                val S = 3
+                                val dataForBoy = File("bmi-boys-z-who-2007-exp.csv")
+                                    .readLines()
+                                    .find {
+                                        it.split(',').first()
+                                            .trim() == kalkulasiBulanUserDariLahir.toString()
+                                    }
+                                    ?.split(',')
+                                    ?.slice(listOf(L, M, S))
 
-                                    val month = columns[0]
-                                    val L = columns[1]
-                                    val M = columns[2]
-                                    val S = columns[3]
-
-                                    val bulanuserlahir = YearMonth.of(2005,11)
-                                    val bulanSekarang = YearMonth.now()
-                                    val kalkulasiBulanUserDariLahir = ChronoUnit.MONTHS.between(bulanuserlahir, bulanSekarang)
-                                    Log.d("CreatingPlan","User male dengan umur sekarang dengan satuan bulan $kalkulasiBulanUserDariLahir")
-
-                                    
+                                // LMS Equation
+                                val z_score = ((bmibocilblmFix / M).pow(L) - 1) / (L * S)
+                                val kategoriBocil = when (z_score) {
+                                    in Double.NEGATIVE_INFINITY..-2.0 -> "Underweight"
+                                    in -2.0..1.0 -> "Normal"
+                                    in 1.0..2.0 -> "Overweight"
+                                    else -> "Obese"
                                 }
+                                Log.d("CreatingPlan", "ini age < 20 boy dapet kategori $kategoriBocil")
+                                return kategoriBocil
+                            } else { // ini pricess
+                                val L = 1
+                                val M = 2
+                                val S = 3
+                                val dataForGirl = File("bmi-boys-z-who-2007-exp.csv")
+                                    .readLines()
+                                    .find {
+                                        it.split(',').first()
+                                            .trim() == kalkulasiBulanUserDariLahir.toString()
+                                    }
+                                    ?.split(',')
+                                    ?.slice(listOf(L, M, S))
+
+                                // LMS Equation
+                                val z_score = ((bmibocilblmFix / M).pow(L) - 1) / (L * S)
+                                val kategoriBocil = when (z_score) {
+                                    in Double.NEGATIVE_INFINITY..-2.0 -> "Underweight"
+                                    in -2.0..1.0 -> "Normal"
+                                    in 1.0..2.0 -> "Overweight"
+                                    else -> "Obese"
+                                }
+                                Log.d("CreatingPlan", "ini age < 20 girl dapet kategori $kategoriBocil")
+                                return kategoriBocil
                             }
                         }
-//                        return bmi()
                     }
-
-
-                    if (userPreferencesfromFirebasehehe.goal == "Keep Fit"){
-                        if (userPreferencesfromFirebasehehe.age < 19)
-                            Log.d("Age","Childen and adoselent")
-
-                    }
+                    val hrMax = 200 - age
+                    val bmi = bmi()
 
                 }
             }
         }
 //        val hrMax = 200 - viewModel.age
     }
+
+
 
 
 

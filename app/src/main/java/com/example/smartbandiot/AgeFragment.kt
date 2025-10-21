@@ -46,7 +46,7 @@ class AgeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.continu.isEnabled =true
+        binding.continu.isEnabled = false
         binding.year.addTextChangedListener { text->
             binding.continu.isEnabled = !text.isNullOrBlank()
         }
@@ -55,23 +55,23 @@ class AgeFragment : Fragment() {
             "Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov","Des"
         )
         val masukinMonth = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1,month)
-
         masukinMonth.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.month.adapter = masukinMonth
 
-        val yearInput = binding.year.text.toString() // "2025"
-        val selectedMonthIndex = binding.month.selectedItemPosition + 1
-        val monthNumber = selectedMonthIndex.toString().padStart(2, '0')
-        val yearMonthCode = "$yearInput$monthNumber" // "202510"
-
-
         binding.continu.setOnClickListener {
+            val selectedMonthIndex = binding.month.selectedItemPosition + 1
+            Log.d("MonthCheck", "Index: $selectedMonthIndex, Month: ${binding.month.selectedItem}")
+            val monthNumber = selectedMonthIndex.toString().padStart(2, '0')
+            val yearInput = binding.year.text.toString() // "2025"
+            val yearMonthCode = "$yearInput$monthNumber" // "202504" harusnya gini
+
+
+
             val viewModel = ViewModelProvider(requireActivity()).get(PreferencesSharedViewModel::class.java)
             viewModel.birthYYYYmm = yearMonthCode
             Log.d("AgeFragment", "Pov Viewmodel: ${viewModel.birthYYYYmm}")
             findNavController().navigate(R.id.agetocreating)
         }
-
     }
 
     companion object {
