@@ -11,7 +11,7 @@ data class User (
     val name: String = firebaseUser?.displayName ?: "",
     val weight: Double, //
     val height: Double, //
-    val age: Int, //
+    var birthYYYYmm: String = "", //
     val profileImagePath: String,
     val email: String,
     val gender: String, //

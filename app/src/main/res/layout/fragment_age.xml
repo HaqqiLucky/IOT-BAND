@@ -25,28 +25,66 @@
             android:gravity="center"
             android:text="Select age" />
 
-        <LinearLayout
-            android:layout_width="150dp"
-            android:layout_height="62dp"
-            android:layout_gravity="center"
-            android:layout_marginTop="20dp"
-            android:orientation="horizontal">
 
-            <EditText
-                android:id="@+id/edit_text_age"
-                android:layout_width="97.75dp"
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:backgroundTint="@color/red_time">
+
+            <LinearLayout
+            android:layout_width="97.78dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="50dp"
+
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15.4sp"
+                android:fontFamily="@font/opensans_regular"
+                android:text="Month"
+                android:layout_marginBottom="30dp"
+                android:layout_gravity="center"/>
+
+            <Spinner
+                android:id="@+id/month"
+                android:layout_width="97.78dp"
                 android:layout_height="62dp"
-                android:background="@drawable/edit_text_weight_height"
-                android:fontFamily="@font/poppins_semibold"
-                android:gravity="center"
-                android:textSize="25.98sp"
-                android:inputType="numberDecimal"
-                android:maxLength="3"
-                android:maxLines="1"
-                android:textColor="@color/black"
-                android:padding="10dp"/>
+                android:spinnerMode="dropdown"
+                android:background="@drawable/spinner_age"/>
+
         </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="97.78dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15.4sp"
+                    android:fontFamily="@font/opensans_regular"
+                    android:text="Years"
+                    android:layout_marginBottom="30dp"
+                    android:layout_gravity="center"/>
+
+                <EditText
+                    android:id="@+id/year"
+                    android:layout_width="97.78dp"
+                    android:layout_height="62dp"
+                    android:hint="1999"
+                    android:textAlignment="center"
+                    android:background="@drawable/spinner_age"/>
+
+            </LinearLayout>
+
+
+        </LinearLayout>
 
     </LinearLayout>
 
