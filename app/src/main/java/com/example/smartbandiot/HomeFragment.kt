@@ -6,10 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.smartbandiot.databinding.FragmentChooseTrainingLevelBinding
 import com.example.smartbandiot.databinding.FragmentHomeBinding
+import com.google.firebase.auth.FirebaseAuth
 import java.time.LocalTime
 import kotlin.random.Random
+
+private val user = FirebaseAuth.getInstance().currentUser
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -35,6 +37,15 @@ class HomeFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
+
+
+        // ini buat ngambil data nama
+        if (user != null) {
+            binding.namaUser.text = user.displayName
+        }
+
+
+
         return binding.root
     }
 

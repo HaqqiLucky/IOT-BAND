@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import com.example.smartbandiot.databinding.FragmentChooseTrainingLevelBinding
-//import com.example.smartbandiot.databinding.FragmentSigninBinding
+import com.example.smartbandiot.databinding.FragmentSigninBinding
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER

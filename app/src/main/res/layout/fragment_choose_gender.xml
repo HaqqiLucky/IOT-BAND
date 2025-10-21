@@ -85,36 +85,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!--    medium-->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/neutral"
-            android:layout_width="360dp"
-            android:backgroundTint="#FFFFFF"
-            android:layout_gravity="center"
-            app:checkedIcon="@null"
-            app:cardForegroundColor="@android:color/transparent"
-            app:cardCornerRadius="7.7dp"
-            android:layout_marginTop="10dp"
-            android:clickable="true"
-            android:checkable="true"
-            app:cardElevation="0dp"
-            android:layout_height="94dp">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center|left"
-                android:paddingLeft="20dp"
-                android:orientation="vertical">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="15.4sp"
-                    android:fontFamily="@font/poppins_medium"
-                    android:text="🫂   Gender Neutral"/>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
 
     </LinearLayout>
 

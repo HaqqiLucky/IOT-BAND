@@ -25,49 +25,6 @@ tools:context=".ChooseWeightFragment">
         android:layout_marginBottom="30dp"
         android:text="Select weight" />
 
-    <com.addisonelliott.segmentedbutton.SegmentedButtonGroup
-        android:id="@+id/buttonGroup"
-        android:layout_width="242.49dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_margin="4dp"
-        android:background="#F1F4F8"
-        app:borderWidth="5dp"
-        app:selectedBorderColor="#F1F4F8"
-        app:dividerPadding="10dp"
-        app:borderColor="#F1F4F8"
-        app:radius="30dp">
-
-        <com.addisonelliott.segmentedbutton.SegmentedButton
-            android:id="@+id/pound"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:fontFamily="@font/poppins_extrabold"
-            android:padding="10dp"
-            android:background="#F1F4F8"
-            app:selectedBackground="#FFFFFF"
-            app:selectedTextColor="#404B52"
-            app:text="Pound"
-            app:rounded="false"
-            app:textColor="@color/black" />
-
-        <com.addisonelliott.segmentedbutton.SegmentedButton
-            android:id="@+id/kg"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="#F1F4F8"
-            app:selectedBackground="#FFFFFF"
-            android:fontFamily="@font/poppins_extrabold"
-            android:padding="10dp"
-            app:selectedTextColor="#404B52"
-            app:text="Kilogram"
-            app:rounded="false"
-            app:textColor="@color/black" />
-
-    </com.addisonelliott.segmentedbutton.SegmentedButtonGroup>
-
     <LinearLayout
         android:layout_width="150dp"
         android:layout_height="62dp"
@@ -90,13 +47,13 @@ tools:context=".ChooseWeightFragment">
             android:padding="10dp"/>
 
         <TextView
-            android:id="@+id/kglb"
+            android:id="@+id/kg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginLeft="5dp"
             android:fontFamily="@font/opensans_regular"
-            android:text="lb"
+            android:text="kg"
             android:textSize="15.4sp" />
     </LinearLayout>
 
@@ -118,3 +75,50 @@ tools:context=".ChooseWeightFragment">
     app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+<!--segmented-->
+
+<!--<com.addisonelliott.segmentedbutton.SegmentedButtonGroup-->
+<!--android:id="@+id/buttonGroup"-->
+<!--android:layout_width="242.49dp"-->
+<!--android:layout_height="wrap_content"-->
+<!--android:layout_gravity="center_horizontal"-->
+<!--android:layout_margin="4dp"-->
+<!--android:background="#F1F4F8"-->
+<!--app:borderWidth="5dp"-->
+<!--app:selectedBorderColor="#F1F4F8"-->
+<!--app:dividerPadding="10dp"-->
+<!--app:borderColor="#F1F4F8"-->
+<!--app:radius="30dp">-->
+
+<!--<com.addisonelliott.segmentedbutton.SegmentedButton-->
+<!--    android:id="@+id/pound"-->
+<!--    android:layout_width="0dp"-->
+<!--    android:layout_height="match_parent"-->
+<!--    android:layout_weight="1"-->
+<!--    android:fontFamily="@font/poppins_extrabold"-->
+<!--    android:padding="10dp"-->
+<!--    android:background="#F1F4F8"-->
+<!--    app:selectedBackground="#FFFFFF"-->
+<!--    app:selectedTextColor="#404B52"-->
+<!--    app:text="Pound"-->
+<!--    app:rounded="false"-->
+<!--    app:textColor="@color/black" />-->
+
+<!--<com.addisonelliott.segmentedbutton.SegmentedButton-->
+<!--    android:id="@+id/kg"-->
+<!--    android:layout_width="0dp"-->
+<!--    android:layout_height="match_parent"-->
+<!--    android:layout_weight="1"-->
+<!--    android:background="#F1F4F8"-->
+<!--    app:selectedBackground="#FFFFFF"-->
+<!--    android:fontFamily="@font/poppins_extrabold"-->
+<!--    android:padding="10dp"-->
+<!--    app:selectedTextColor="#404B52"-->
+<!--    app:text="Kilogram"-->
+<!--    app:rounded="false"-->
+<!--    app:textColor="@color/black" />-->
+
+<!--</com.addisonelliott.segmentedbutton.SegmentedButtonGroup>-->

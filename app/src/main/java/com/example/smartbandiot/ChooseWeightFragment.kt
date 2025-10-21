@@ -1,11 +1,13 @@
 package com.example.smartbandiot
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.smartbandiot.databinding.FragmentChooseHeightBinding
 import com.example.smartbandiot.databinding.FragmentChooseWeightBinding
@@ -25,13 +27,12 @@ class ChooseWeightFragment : Fragment() {
     private var _binding: FragmentChooseWeightBinding? = null
 
     private val binding get() = _binding!!
-    private var param1: String? = null
+    private var getWeight: String? = null
     private var param2: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
     }
@@ -48,15 +49,18 @@ class ChooseWeightFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.continu.setOnClickListener {
-            findNavController().navigate(R.id.weighttotraining)
+            val viewModel = ViewModelProvider(requireActivity()).get(PreferencesSharedViewModel::class.java)
+            viewModel.weight = binding.editTextWeight.text.toString().toDouble()
+            Log.d("Weight", "Pov Viewmodel: ${viewModel.weight}")
+            findNavController().navigate(R.id.weightToAge)
         }
 
-        binding.buttonGroup.setOnPositionChangedListener { position ->
-            when (position) {
-                0 -> binding.kglb.text = "lb"
-                1 -> binding.kglb.text = "kg"
-            }
-        }
+//        binding.buttonGroup.setOnPositionChangedListener { position ->
+//            when (position) {
+//                0 -> binding.kglb.text = "lb"
+//                1 -> binding.kglb.text = "kg"
+//            }
+//        }
 
         binding.continu.isEnabled =false
         binding.editTextWeight.addTextChangedListener { text->
