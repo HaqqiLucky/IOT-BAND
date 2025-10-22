@@ -1,7 +1,7 @@
 package com.example.smartbandiot.model
 
-data class PersonalRunningProfile(
-    val bmi : Double,
+data class PersonalRunningProfileTarget(
+    val time : Double,
     val currentKm : Double,
-    
+
 )

@@ -52,7 +52,6 @@ class CreatingPlanFragment : Fragment() {
         }
         saveUserDataToFirebase()
         Log.d("CreatingPLanFragment","Sampe sini harusnya udah masuk ke database")
-
     }
 
     override fun onCreateView(
@@ -105,6 +104,8 @@ class CreatingPlanFragment : Fragment() {
         userRef.child(uid).setValue(user)
             .addOnSuccessListener {
                 Log.d("user_personal_preferences","mi sukses")
+                rulebase()
+                Log.d("CreatingPLanFragment","Rulebase masuk")
             }
             .addOnFailureListener { e ->
                 Log.e("user_personal_preferences","ya elah ga masuk")
@@ -112,11 +113,11 @@ class CreatingPlanFragment : Fragment() {
     }
 
     private fun rulebase(){
-//        val viewModel = ViewModelProvider(requireActivity())[PreferencesSharedViewModel::class.java]
-//        val dfRef = Firebase.
-//        val auth = FirebaseAuth.getInstance()
+        val auth = FirebaseAuth.getInstance()
+        val uid = auth.currentUser?.uid ?: return
 
-        userRef.get().addOnSuccessListener { snapshot ->
+
+        userRef.child(uid).get().addOnSuccessListener { snapshot ->
             if (snapshot.exists()){
                 val userPreferencesfromFirebasehehe = snapshot.getValue(User::class.java)
                 if (userPreferencesfromFirebasehehe != null) {
@@ -131,8 +132,10 @@ class CreatingPlanFragment : Fragment() {
                         ChronoUnit.MONTHS.between(bulanuserlahir, bulanSekarang)
                     Log.d(
                         "CreatingPlan",
-                        "umur sekarang dengan satuan bulan $kalkulasiBulanUserDariLahir"
+                        "umur sekarang dengan satuan bulan $kalkulasiBulanUserDariLahir dengan bulan di hitung saat ini $bulanSekarang"
                     )
+                    val bulanLahir = YearMonth.of(birthYear, birthMonth)
+                    val totalBulan = ChronoUnit.MONTHS.between(bulanLahir, bulanSekarang)
 
                     val tahunSekarang = Year.now()
                     val birthYear2 = Year.of(birthYear)
@@ -145,8 +148,10 @@ class CreatingPlanFragment : Fragment() {
                         val height = userPreferencesfromFirebasehehe.height
                         val sex = userPreferencesfromFirebasehehe.gender
 
-                        if (age >= 20) {
-                            val kalkulasi = weight / (height * height)
+                        if (age >= 19) {
+                            val kalkulasibmi = weight / (height * height)
+                            val kalkulasi = kalkulasibmi * 10000
+                            Log.d("CreatingPlan", "Hasil kalkulasi BMI :  $kalkulasibmi dan yang sudah di kali 10.000 $kalkulasi")
                             val kategori = when (kalkulasi) {
                                 in Double.NEGATIVE_INFINITY..18.4 -> "Underweight"
                                 in 18.5..24.9 -> "Normal"
@@ -162,17 +167,24 @@ class CreatingPlanFragment : Fragment() {
                                 val L = 1
                                 val M = 2
                                 val S = 3
-                                val dataForBoy = File("bmi-boys-z-who-2007-exp.csv")
-                                    .readLines()
-                                    .find {
-                                        it.split(',').first()
-                                            .trim() == kalkulasiBulanUserDariLahir.toString()
-                                    }
-                                    ?.split(',')
-                                    ?.slice(listOf(L, M, S))
+//                                val dataForBoy = File("app/src/main/assets/bmi-boys-z-who-2007-exp.csv")
+//                                    .readLines()
+//                                    .find {
+//                                        it.split(',').first()
+//                                            .trim() == kalkulasiBulanUserDariLahir.toString()
+//                                    }
+//                                    ?.split(',')
+//                                    ?.slice(listOf(L, M, S))
+                                val inputStream = requireContext().assets.open("bmi-boys-z-who-2007-exp.csv")
+                                val lines = inputStream.bufferedReader().readLines()
+
+                                val dataForBoy = lines.find {
+                                    it.split(',').first().trim() == kalkulasiBulanUserDariLahir.toString()
+                                }?.split(',')?.slice(listOf(L, M, S))
 
                                 // LMS Equation
                                 val z_score = ((bmibocilblmFix / M).pow(L) - 1) / (L * S)
+                                Log.d("CreatingPlan", "Hasil z score = $z_score")
                                 val kategoriBocil = when (z_score) {
                                     in Double.NEGATIVE_INFINITY..-2.0 -> "Underweight"
                                     in -2.0..1.0 -> "Normal"
@@ -185,17 +197,25 @@ class CreatingPlanFragment : Fragment() {
                                 val L = 1
                                 val M = 2
                                 val S = 3
-                                val dataForGirl = File("bmi-boys-z-who-2007-exp.csv")
-                                    .readLines()
-                                    .find {
-                                        it.split(',').first()
-                                            .trim() == kalkulasiBulanUserDariLahir.toString()
-                                    }
-                                    ?.split(',')
-                                    ?.slice(listOf(L, M, S))
+//                                val dataForGirl = File("app/src/main/assets/bmi-girls-z-who-2007-exp.csv")
+//                                    .readLines()
+//                                    .find {
+//                                        it.split(',').first()
+//                                            .trim() == kalkulasiBulanUserDariLahir.toString()
+//                                    }
+//                                    ?.split(',')
+//                                    ?.slice(listOf(L, M, S))
+                                val inputStream = requireContext().assets.open("bmi-girls-z-who-2007-exp.csv")
+                                val lines = inputStream.bufferedReader().readLines()
+
+                                val dataForGirl = lines.find {
+                                    it.split(',').first().trim() == kalkulasiBulanUserDariLahir.toString()
+                                }?.split(',')?.slice(listOf(L, M, S))
+
 
                                 // LMS Equation
                                 val z_score = ((bmibocilblmFix / M).pow(L) - 1) / (L * S)
+                                Log.d("CreatingPlan", "Hasil z score = $z_score")
                                 val kategoriBocil = when (z_score) {
                                     in Double.NEGATIVE_INFINITY..-2.0 -> "Underweight"
                                     in -2.0..1.0 -> "Normal"
@@ -209,11 +229,50 @@ class CreatingPlanFragment : Fragment() {
                     }
                     val hrMax = 200 - age
                     val bmi = bmi()
+                    Log.d("Creating Plan","BMI yg didapet $bmi")
 
+                    // jadwal umur
+                    val jadwal = when {
+                        age in 5 .. 19 -> "Minimal 3 jam seminggu"
+                        age in 20 .. 64 -> "Minimal 7.5 jam seminggu"
+                        age >= 65 -> "2.5 jam seminggu"
+                        else -> "Tidak ada rekomendasi, usia terlalu dini"
+                    }
+                    // rekomendasi hari = senen, rabu, sabtu
+
+                    // bmi
+                    val olahragaUser = if (bmi == "Underweight" || bmi == "Obese"){
+                        "Jalan santai"
+                    }else{
+                        "Jogging"
+                    }
+
+                    // HrMax
+                    val HrTarget = if (bmi == "Normal") {
+                        (0.75 * hrMax)..(0.85 * hrMax)
+                    } else { // obese, underweight sama overweight
+                        (0.75 * hrMax)
+                    }
+
+                    val rulebaseUser = mapOf(
+                        "jenisOlahragaUser" to olahragaUser,
+                        "HrTarget" to HrTarget.toString(),
+                        "jadwal" to jadwal
+                    )
+                    userRef.child(uid).child("hasilRulebase").setValue(rulebaseUser)
+                        .addOnSuccessListener {
+                            Log.d("Creating plan","Rulebase udah masuk")
+                            Log.d("Creating plan","jenis olahraga $olahragaUser")
+                            Log.d("Creating plan","Hr target $HrTarget")
+                            Log.d("Creating plan","jadwal $jadwal")
+                        } .addOnFailureListener {
+                            Log.d("Creating plan", "life bloom like flower..")
+                        }
                 }
             }
+
         }
-//        val hrMax = 200 - viewModel.age
+
     }
 
 
