@@ -9,33 +9,17 @@ import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.example.smartbandiot.databinding.FragmentChooseHeightBinding
 import com.example.smartbandiot.databinding.FragmentChooseWeightBinding
+import android.widget.Toast // Tambahkan Toast untuk feedback
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [ChooseWeightFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ChooseWeightFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var _binding: FragmentChooseWeightBinding? = null
 
+    private var _binding: FragmentChooseWeightBinding? = null
     private val binding get() = _binding!!
     private var getWeight: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,35 +33,36 @@ class ChooseWeightFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.continu.setOnClickListener {
-            val viewModel = ViewModelProvider(requireActivity()).get(PreferencesSharedViewModel::class.java)
-            viewModel.weight = binding.editTextWeight.text.toString().toDouble()
-            Log.d("Weight", "Pov Viewmodel: ${viewModel.weight}")
-            findNavController().navigate(R.id.weightToAge)
+            val viewModel = ViewModelProvider(requireActivity())[PreferencesSharedViewModel::class.java]
+
+            // --- DIPERBARUI: Ambil dan simpan Weight ke ViewModel ---
+            val weightInput = binding.editTextWeight.text.toString()
+            val weightDouble = weightInput.toDoubleOrNull()
+
+            if (weightDouble != null && weightDouble > 0) {
+                // Berhasil: Simpan ke ViewModel
+                viewModel.weight = weightDouble
+                Log.d("ChooseWeight", "Weight saved to ViewModel: ${viewModel.weight}")
+                findNavController().navigate(R.id.weightToAge)
+            } else {
+                // Gagal: Input tidak valid
+                Toast.makeText(requireContext(), "Masukkan berat badan yang valid.", Toast.LENGTH_SHORT).show()
+                Log.e("ChooseWeight", "Invalid weight input: $weightInput")
+            }
         }
 
-//        binding.buttonGroup.setOnPositionChangedListener { position ->
-//            when (position) {
-//                0 -> binding.kglb.text = "lb"
-//                1 -> binding.kglb.text = "kg"
-//            }
-//        }
-
-        binding.continu.isEnabled =false
+        binding.continu.isEnabled = false
         binding.editTextWeight.addTextChangedListener { text->
             binding.continu.isEnabled = !text.isNullOrBlank()
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ChooseWeightFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             ChooseWeightFragment().apply {

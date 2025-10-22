@@ -6,25 +6,12 @@
     android:layout_height="match_parent"
     android:background="@android:color/white">
 
-    <!-- Top Bar -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="@android:color/white"
         app:layout_constraintTop_toTopOf="parent">
-
-<!--        <ImageButton-->
-<!--            android:id="@+id/btnBack"-->
-<!--            android:layout_width="48dp"-->
-<!--            android:layout_height="48dp"-->
-<!--            android:background="?attr/selectableItemBackgroundBorderless"-->
-<!--            android:contentDescription="Back"-->
-<!--            android:src="@drawable/back_arrow_baseline"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toTopOf="parent"-->
-<!--            android:layout_marginStart="8dp" />-->
 
         <TextView
             android:layout_width="wrap_content"
@@ -51,7 +38,6 @@
             android:layout_marginEnd="8dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Profile Image -->
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/imgProfile"
         android:layout_width="120dp"
@@ -65,7 +51,6 @@
         app:layout_constraintTop_toBottomOf="@id/topBar"
         />
 
-    <!-- User Name -->
     <TextView
         android:id="@+id/tvUserName"
         android:layout_width="wrap_content"
@@ -80,7 +65,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/imgProfile" />
 
-    <!-- Stats Container -->
+    <TextView
+        android:id="@+id/tvUserEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="email@google.com"
+        android:textColor="#666666"
+        android:textSize="14sp"
+        android:layout_marginTop="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvUserName" />
+
     <LinearLayout
         android:id="@+id/statsContainer"
         android:layout_width="match_parent"
@@ -89,43 +85,39 @@
         android:layout_marginHorizontal="32dp"
         android:orientation="horizontal"
         android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@id/tvUserName">
+        app:layout_constraintTop_toBottomOf="@id/tvUserEmail"> <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center">
 
-        <!-- Weight -->
-        <LinearLayout
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/tvWeight"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:text="55"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/tvWeight"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="55"
-                android:textColor="@android:color/black"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="kg"
+            android:textColor="@android:color/black"
+            android:textSize="12sp"
+            android:layout_marginStart="2dp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="kg"
-                android:textColor="@android:color/black"
-                android:textSize="12sp"
-                android:layout_marginStart="2dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Weight"
+            android:textColor="#666666"
+            android:textSize="14sp" />
+    </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Weight"
-                android:textColor="#666666"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-        <!-- Height -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -159,7 +151,6 @@
                 android:textSize="14sp" />
         </LinearLayout>
 
-        <!-- Age -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -194,7 +185,6 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Tab Buttons -->
     <LinearLayout
         android:id="@+id/tabButtons"
         android:layout_width="match_parent"
@@ -240,7 +230,6 @@
             android:textSize="14sp" />
     </LinearLayout>
 
-    <!-- Health Cards Container -->
     <LinearLayout
         android:id="@+id/healthCardsContainer"
         android:layout_width="match_parent"
@@ -250,7 +239,6 @@
         android:orientation="horizontal"
         app:layout_constraintTop_toBottomOf="@id/tabButtons">
 
-        <!-- Heart Card -->
         <androidx.cardview.widget.CardView
             android:layout_width="0dp"
             android:layout_height="160dp"
@@ -288,7 +276,6 @@
                         android:textStyle="bold" />
                 </LinearLayout>
 
-                <!-- Heart Rate Visualization -->
                 <ImageView
                     android:id="@+id/imgHeartWave"
                     android:layout_width="match_parent"
@@ -298,7 +285,7 @@
                     android:src="@drawable/outline_heart"
                     android:scaleType="fitCenter"
                     android:contentDescription="Heart Wave"
-                />
+                    />
 
                 <TextView
                     android:id="@+id/tvHeartRate"
@@ -319,7 +306,6 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Sleep Card -->
         <androidx.cardview.widget.CardView
             android:layout_width="0dp"
             android:layout_height="160dp"
@@ -357,7 +343,6 @@
                         android:textStyle="bold" />
                 </LinearLayout>
 
-                <!-- Sleep Circle Progress -->
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
@@ -372,10 +357,6 @@
                         android:layout_centerInParent="true"
                         android:indeterminate="false"
                         android:max="12"/>
-<!--                        android:progress="8"-->
-<!--                        android:progressDrawable="@drawable/circular_progress"-->
-<!--                        android:rotation="-90" -->
-<!--                    />-->
 
                     <LinearLayout
                         android:layout_width="wrap_content"

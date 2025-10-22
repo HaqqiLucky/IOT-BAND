@@ -9,34 +9,17 @@ import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.example.smartbandiot.databinding.FragmentChooseGenderBinding
 import com.example.smartbandiot.databinding.FragmentChooseHeightBinding
+import android.widget.Toast // Tambahkan Toast untuk feedback
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [ChooseHeightFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ChooseHeightFragment : Fragment() {
 
     private var _binding: FragmentChooseHeightBinding? = null
-
     private val binding get() = _binding!!
-    // TODO: Rename and change types of parameters
     private var getHeight: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,35 +33,36 @@ class ChooseHeightFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.continu.setOnClickListener {
-            val viewModel = ViewModelProvider(requireActivity()).get(PreferencesSharedViewModel::class.java)
-            viewModel.height = binding.editTextHeight.text.toString().toDouble()
-            Log.d("ChooseHeight", "Pov Viewmodel: ${viewModel.height}")
-            findNavController().navigate(R.id.heighttoweight)
+            val viewModel = ViewModelProvider(requireActivity())[PreferencesSharedViewModel::class.java]
+
+            // --- DIPERBARUI: Ambil dan simpan Height ke ViewModel ---
+            val heightInput = binding.editTextHeight.text.toString()
+            val heightDouble = heightInput.toDoubleOrNull()
+
+            if (heightDouble != null && heightDouble > 0) {
+                // Berhasil: Simpan ke ViewModel
+                viewModel.height = heightDouble
+                Log.d("ChooseHeight", "Height saved to ViewModel: ${viewModel.height}")
+                findNavController().navigate(R.id.heighttoweight)
+            } else {
+                // Gagal: Input tidak valid
+                Toast.makeText(requireContext(), "Masukkan tinggi badan yang valid.", Toast.LENGTH_SHORT).show()
+                Log.e("ChooseHeight", "Invalid height input: $heightInput")
+            }
         }
 
-//        binding.buttonGroup.setOnPositionChangedListener { position ->
-//            when (position) {
-//                0 -> binding.ftcm.text = "ft"
-//                1 -> binding.ftcm.text = "cm"
-//            }
-//        }
-
-        binding.continu.isEnabled =false
+        binding.continu.isEnabled = false
         binding.editTextHeight.addTextChangedListener { text->
             binding.continu.isEnabled = !text.isNullOrBlank()
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ChooseHeightFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             ChooseHeightFragment().apply {

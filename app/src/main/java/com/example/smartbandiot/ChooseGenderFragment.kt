@@ -1,5 +1,6 @@
 package com.example.smartbandiot
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -10,33 +11,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.smartbandiot.databinding.FragmentChooseGenderBinding
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [ChooseGenderFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ChooseGenderFragment : Fragment() {
 
     private var _binding: FragmentChooseGenderBinding? = null
-
     private val binding get() = _binding!!
     private var selectedGender : String? = null
-
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,9 +26,7 @@ class ChooseGenderFragment : Fragment() {
     ): View? {
         _binding = FragmentChooseGenderBinding.inflate(inflater, container, false)
         return binding.root
-
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -60,11 +40,9 @@ class ChooseGenderFragment : Fragment() {
                     it.isChecked = false
                     it.isSelected = false
                 }
-
                 gender.isChecked = true
                 gender.isSelected = true
                 binding.continu.isEnabled = true
-
                 selectedGender = when (gender.id) {
                     binding.man.id -> "Male"
                     binding.woman.id -> "Female"
@@ -74,24 +52,39 @@ class ChooseGenderFragment : Fragment() {
         }
 
         binding.continu.setOnClickListener {
-            val viewModel = ViewModelProvider(requireActivity()).get(PreferencesSharedViewModel::class.java)
+            val viewModel = ViewModelProvider(requireActivity())[PreferencesSharedViewModel::class.java]
             viewModel.gender = selectedGender.toString()
-            Log.d("Gender", "Pov Viewmodel: ${viewModel.gender}, pov choosegenderfragment.kt: $selectedGender")
+
+            // --- LOGIKA PENYIMPANAN DATA PERMANEN KE SharedPreferences ---
+            val sharedPref = requireContext().getSharedPreferences("user_profile", Context.MODE_PRIVATE)
+            with(sharedPref.edit()) {
+                // 1. Simpan Gender
+                putString("gender", viewModel.gender)
+
+                // 2. Simpan Weight (Ambil dari ViewModel, jika null/belum ada, gunakan "0.0")
+                val weight = viewModel.weight?.toString() ?: "0.0"
+                putString("weight", weight)
+                Log.d("SaveData", "Final Saving Weight: $weight")
+
+                // 3. Simpan Height (Ambil dari ViewModel, jika null/belum ada, gunakan "0.0")
+                val height = viewModel.height?.toString() ?: "0.0"
+                putString("height", height)
+                Log.d("SaveData", "Final Saving Height: $height")
+
+                apply()
+            }
+            // --- AKHIR LOGIKA PENYIMPANAN ---
+
             findNavController().navigate(R.id.gendertomain)
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ChooseGenderFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             ChooseGenderFragment().apply {

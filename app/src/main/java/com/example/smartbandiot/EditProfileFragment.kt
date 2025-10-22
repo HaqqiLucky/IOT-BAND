@@ -1,6 +1,7 @@
 package com.example.smartbandiot
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -10,9 +11,13 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
+import com.google.firebase.auth.FirebaseAuth
 import de.hdodenhof.circleimageview.CircleImageView
 
 class EditProfileFragment : Fragment() {
+
+    private val currentUser = FirebaseAuth.getInstance().currentUser
 
     private lateinit var btnBack: ImageButton
     private lateinit var btnChangePhoto: ImageButton
@@ -28,7 +33,6 @@ class EditProfileFragment : Fragment() {
 
     private var selectedImageUri: Uri? = null
 
-    // Image picker launcher
     private val imagePickerLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -46,38 +50,26 @@ class EditProfileFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_edit_profile, container, false)
 
-        // Sembunyikan bottom navbar
         hideBottomNavBar()
-
-        // Inisialisasi views
         initViews(view)
-
-        // Setup Gender Spinner
         setupGenderSpinner()
-
-        // Setup click listeners
         setupClickListeners()
-
-        // Load existing data (jika ada)
-        loadUserData()
+        loadUserData() // Panggil untuk memuat data awal
 
         return view
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        // Tampilkan kembali bottom navbar saat fragment dihancurkan
         showBottomNavBar()
     }
 
     private fun hideBottomNavBar() {
-        // Sembunyikan container navbar (MaterialCardView)
-        activity?.findViewById<View>(R.id.bottom_navbar_main_activity)?.visibility = View.GONE
+        activity?.findViewById<View>(R.id.navigation_main)?.visibility = View.GONE
     }
 
     private fun showBottomNavBar() {
-        // Tampilkan container navbar (MaterialCardView)
-        activity?.findViewById<View>(R.id.bottom_navbar_main_activity)?.visibility = View.VISIBLE
+        activity?.findViewById<View>(R.id.navigation_main)?.visibility = View.VISIBLE
     }
 
     private fun initViews(view: View) {
@@ -106,17 +98,14 @@ class EditProfileFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
-        // Back button - kembali ke SettingsFragment
         btnBack.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
 
-        // Change photo button
         btnChangePhoto.setOnClickListener {
             openImagePicker()
         }
 
-        // Save button
         btnSave.setOnClickListener {
             saveProfile()
         }
@@ -129,19 +118,49 @@ class EditProfileFragment : Fragment() {
     }
 
     private fun loadUserData() {
-        // TODO: Load data dari SharedPreferences atau Database
-        // Contoh data dummy:
-        etFullName.setText("CROG Robotic")
-        etPhone.setText("9876543210")
-        etEmail.setText("loremipsum@gmail.com")
-        etWeight.setText("55")
-        etHeight.setText("165")
-        spinnerGender.setSelection(0) // Male
-        etAge.setText("20")
+        val sharedPref = requireContext().getSharedPreferences("user_profile", Context.MODE_PRIVATE)
+
+        // --- Muat Data Google Auth ---
+        if (currentUser != null) {
+            etFullName.setText(currentUser.displayName ?: sharedPref.getString("full_name", ""))
+            etEmail.setText(currentUser.email ?: sharedPref.getString("email", ""))
+            etEmail.isEnabled = false // Email dari Google tidak bisa diedit
+
+            val photoUrl = currentUser.photoUrl
+            if (photoUrl != null) {
+                Glide.with(this)
+                    .load(photoUrl)
+                    .placeholder(R.drawable.ic_launcher_foreground)
+                    .error(R.drawable.ic_launcher_foreground)
+                    .into(profileImage)
+            } else {
+                profileImage.setImageResource(R.drawable.ic_launcher_foreground)
+            }
+        } else {
+            // Muat data jika tidak ada user Google
+            etFullName.setText(sharedPref.getString("full_name", ""))
+            etEmail.setText(sharedPref.getString("email", ""))
+            etEmail.isEnabled = true
+        }
+
+        // --- MUAT DATA Weight, Height, Age, Gender, Phone dari SharedPreferences ---
+        // Nilai default "0" atau "0.0" memastikan field tidak kosong saat pertama dibuka.
+        etPhone.setText(sharedPref.getString("phone", ""))
+        etWeight.setText(sharedPref.getString("weight", "0.0")) // <-- Memuat Weight
+        etHeight.setText(sharedPref.getString("height", "0.0")) // <-- Memuat Height
+        etAge.setText(sharedPref.getString("age", "0"))         // <-- Memuat Age
+
+        // Set Gender Spinner
+        val savedGender = sharedPref.getString("gender", "Male")
+        val genderOptions = arrayOf("Male", "Female", "Other")
+        val genderIndex = genderOptions.indexOf(savedGender)
+        if (genderIndex >= 0) {
+            spinnerGender.setSelection(genderIndex)
+        }
     }
 
     private fun saveProfile() {
-        // Validasi input
+        // Ambil input
         val fullName = etFullName.text.toString().trim()
         val phone = etPhone.text.toString().trim()
         val email = etEmail.text.toString().trim()
@@ -151,59 +170,28 @@ class EditProfileFragment : Fragment() {
         val age = etAge.text.toString().trim()
 
         // Validasi sederhana
-        if (fullName.isEmpty()) {
-            etFullName.error = "Full name is required"
-            etFullName.requestFocus()
+        if (fullName.isEmpty() || phone.isEmpty() || email.isEmpty() || weight.isEmpty() || height.isEmpty() || age.isEmpty()) {
+            Toast.makeText(context, "Semua kolom harus diisi.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        if (phone.isEmpty()) {
-            etPhone.error = "Phone number is required"
-            etPhone.requestFocus()
-            return
+        // --- SIMPAN DATA BARU KE SharedPreferences ---
+        val sharedPref = requireContext().getSharedPreferences("user_profile", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putString("full_name", fullName)
+            putString("phone", phone)
+
+            // Simpan semua data yang diedit
+            putString("weight", weight)
+            putString("height", height)
+            putString("gender", gender)
+            putString("age", age)
+
+            apply()
         }
+        // --- AKHIR SIMPAN DATA ---
 
-        if (email.isEmpty()) {
-            etEmail.error = "Email is required"
-            etEmail.requestFocus()
-            return
-        }
-
-        if (weight.isEmpty()) {
-            etWeight.error = "Weight is required"
-            etWeight.requestFocus()
-            return
-        }
-
-        if (height.isEmpty()) {
-            etHeight.error = "Height is required"
-            etHeight.requestFocus()
-            return
-        }
-
-        if (age.isEmpty()) {
-            etAge.error = "Age is required"
-            etAge.requestFocus()
-            return
-        }
-
-        // TODO: Simpan data ke SharedPreferences atau Database
-        // Contoh:
-        // val sharedPref = requireContext().getSharedPreferences("user_profile", Context.MODE_PRIVATE)
-        // with(sharedPref.edit()) {
-        //     putString("full_name", fullName)
-        //     putString("phone", phone)
-        //     putString("email", email)
-        //     putString("weight", weight)
-        //     putString("height", height)
-        //     putString("gender", gender)
-        //     putString("age", age)
-        //     apply()
-        // }
-
-        Toast.makeText(context, "Profile saved successfully!", Toast.LENGTH_SHORT).show()
-
-        // Kembali ke Settings Fragment
+        Toast.makeText(context, "Profile berhasil disimpan!", Toast.LENGTH_SHORT).show()
         parentFragmentManager.popBackStack()
     }
 }

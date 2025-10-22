@@ -1,5 +1,6 @@
 package com.example.smartbandiot
 
+import android.content.Context // <-- TAMBAHAN
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -11,34 +12,20 @@ import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.smartbandiot.databinding.FragmentAgeBinding
-import com.example.smartbandiot.databinding.FragmentChooseHeightBinding
+import java.time.Year // <-- TAMBAHAN (Memerlukan minimum API 26)
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [AgeFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class AgeFragment : Fragment() {
-    // TODO: Rename and change types of parameters
     private var _binding: FragmentAgeBinding? = null
-
     private val binding get() = _binding!!
     private var getAge: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         _binding = FragmentAgeBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -60,30 +47,43 @@ class AgeFragment : Fragment() {
 
         binding.continu.setOnClickListener {
             val selectedMonthIndex = binding.month.selectedItemPosition + 1
-            Log.d("MonthCheck", "Index: $selectedMonthIndex, Month: ${binding.month.selectedItem}")
             val monthNumber = selectedMonthIndex.toString().padStart(2, '0')
-            val yearInput = binding.year.text.toString() // "2025"
-            val yearMonthCode = "$yearInput$monthNumber" // "202504" harusnya gini
+            val yearInput = binding.year.text.toString()
+            val yearMonthCode = "$yearInput$monthNumber"
 
-
-
-            val viewModel = ViewModelProvider(requireActivity()).get(PreferencesSharedViewModel::class.java)
+            val viewModel = ViewModelProvider(requireActivity())[PreferencesSharedViewModel::class.java]
             viewModel.birthYYYYmm = yearMonthCode
             Log.d("AgeFragment", "Pov Viewmodel: ${viewModel.birthYYYYmm}")
+
+            // --- LOGIKA MENGHITUNG DAN MENYIMPAN USIA PERMANEN ---
+            val currentYear = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                Year.now().value
+            } else {
+                // Fallback untuk API di bawah 26 (Android 8.0)
+                java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)
+            }
+
+            val birthYear = yearInput.toIntOrNull() ?: currentYear
+            val age = (currentYear - birthYear).coerceAtLeast(0) // Pastikan usia tidak negatif
+
+            val sharedPref = requireContext().getSharedPreferences("user_profile", Context.MODE_PRIVATE)
+            with(sharedPref.edit()) {
+                // Menyimpan Usia untuk ditampilkan
+                putString("age", age.toString())
+                apply()
+            }
+            // --- AKHIR LOGIKA SIMPAN USIA ---
+
             findNavController().navigate(R.id.agetocreating)
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment AgeFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             AgeFragment().apply {

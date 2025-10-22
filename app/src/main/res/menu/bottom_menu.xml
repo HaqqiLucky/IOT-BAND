@@ -16,7 +16,7 @@
     <item
         android:id="@+id/history"
         android:icon="@drawable/icon_history"
-        android:title="Heart rate"
+        android:title="History"
         app:cnb_iconColor="@color/green_app_theme"/>
     <item
         android:id="@+id/profile"
