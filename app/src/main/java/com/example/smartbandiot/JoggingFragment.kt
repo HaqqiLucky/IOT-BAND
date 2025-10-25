@@ -1,116 +1,149 @@
 package com.example.smartbandiot
 
-import android.graphics.BitmapFactory
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.example.smartbandiot.databinding.FragmentJoggingBinding
-import org.maplibre.android.geometry.LatLng
-import org.maplibre.android.maps.MapLibreMap
-import org.maplibre.android.maps.MapView
-import org.maplibre.android.maps.OnMapReadyCallback
-import org.maplibre.android.camera.CameraUpdateFactory
-import org.maplibre.android.style.layers.SymbolLayer
-import org.maplibre.android.style.sources.GeoJsonSource
-import org.maplibre.geojson.Feature
-import org.maplibre.geojson.Point
-import org.maplibre.android.style.layers.PropertyFactory.*
-import org.maplibre.android.style.layers.PropertyFactory.iconImage
+import com.google.firebase.database.*
+import org.osmdroid.api.IMapController
+import org.osmdroid.config.Configuration
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
-class JoggingFragment : Fragment(), OnMapReadyCallback {
+class JoggingFragment : Fragment() {
 
     private var _binding: FragmentJoggingBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var mapView: MapView
-    private var mapLibreMap: MapLibreMap? = null
+    private lateinit var map: MapView
+    private lateinit var controller: IMapController
+
+    // 🔥 Tambahkan Firebase Reference
+    private lateinit var database: FirebaseDatabase
+    private lateinit var heartRateRef: DatabaseReference
+    private lateinit var stepsRef: DatabaseReference
+    private lateinit var timestampRef: DatabaseReference
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentJoggingBinding.inflate(inflater, container, false)
-        mapView = binding.mapView
-        mapView.onCreate(savedInstanceState)
-        mapView.getMapAsync(this)
-        return binding.root
+        val view = binding.root
+
+        // ✅ Setup konfigurasi OSM
+        Configuration.getInstance().load(
+            requireContext(),
+            PreferenceManager.getDefaultSharedPreferences(requireContext())
+        )
+
+        map = binding.mapView
+        map.setTileSource(TileSourceFactory.MAPNIK)
+        map.setMultiTouchControls(true)
+        map.setBuiltInZoomControls(true)
+
+        controller = map.controller
+        controller.setZoom(17.0)
+
+        // ✅ Setup Firebase
+        database = FirebaseDatabase.getInstance("https://smartbandforteens-default-rtdb.firebaseio.com/")
+        heartRateRef = database.getReference("heartRate")
+        stepsRef = database.getReference("steps")
+        timestampRef = database.getReference("timestamp")
+
+        // 🔁 Tambahkan listener Firebase
+        addFirebaseListeners()
+
+        // ✅ Lokasi pengguna
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            val locationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(requireContext()), map)
+            locationOverlay.enableMyLocation()
+            map.overlays.add(locationOverlay)
+
+            locationOverlay.runOnFirstFix {
+                requireActivity().runOnUiThread {
+                    val myLoc = locationOverlay.myLocation
+                    if (myLoc != null) {
+                        controller.setCenter(GeoPoint(myLoc.latitude, myLoc.longitude))
+                    }
+                }
+            }
+        } else {
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 100)
+        }
+
+        return view
     }
 
-    override fun onMapReady(maplibreMap: MapLibreMap) {
-        mapLibreMap = maplibreMap
-
-        try {
-            maplibreMap.setStyle("https://demotiles.maplibre.org/style.json") { style ->
-                val location = LatLng(-6.200000, 106.816666) // Jakarta
-
-                // Tambahkan ikon marker ke dalam style
-                style.addImage(
-                    "marker-icon-id",
-                    BitmapFactory.decodeResource(resources, R.drawable.maplibre_marker_icon_default)
-                )
-
-                // Tambahkan marker dengan GeoJSON source
-                val geoJsonSource = GeoJsonSource(
-                    "marker-source",
-                    Feature.fromGeometry(Point.fromLngLat(location.longitude, location.latitude))
-                )
-                style.addSource(geoJsonSource)
-
-                // Buat layer untuk marker
-                val symbolLayer = SymbolLayer("marker-layer", "marker-source").withProperties(
-                    iconImage("marker-icon-id"),
-                    iconSize(1.2f),
-                    iconAllowOverlap(true),
-                    iconIgnorePlacement(true)
-                )
-                style.addLayer(symbolLayer)
-
-                // Posisikan kamera ke Jakarta
-                maplibreMap.moveCamera(
-                    CameraUpdateFactory.newLatLngZoom(location, 12.0)
-                )
-
-                Log.d("JoggingFragment", "MapLibre berhasil dimuat dengan marker.")
+    // 🔥 Fungsi ambil data Firebase real-time
+    private fun addFirebaseListeners() {
+        // Heart Rate
+        heartRateRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val heartRate = snapshot.getValue(Int::class.java)
+                heartRate?.let {
+                    Log.d("JoggingFirebase", "❤️ Heart Rate: $it bpm")
+                }
             }
 
-        } catch (e: Exception) {
-            Log.e("JoggingFragment", "Error initializing MapLibre: ${e.message}", e)
-        }
-    }
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("JoggingFirebase", "Error reading heartRate: ${error.message}")
+            }
+        })
 
-    // Lifecycle MapView
-    override fun onStart() {
-        super.onStart()
-        mapView.onStart()
+        // Steps
+        stepsRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val steps = snapshot.getValue(Int::class.java)
+                steps?.let {
+                    Log.d("JoggingFirebase", "👣 Steps: $it")
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("JoggingFirebase", "Error reading steps: ${error.message}")
+            }
+        })
+
+        // Timestamp
+        timestampRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val time = snapshot.getValue(String::class.java)
+                time?.let {
+                    Log.d("JoggingFirebase", "⏱ Timestamp: $it")
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("JoggingFirebase", "Error reading timestamp: ${error.message}")
+            }
+        })
     }
 
     override fun onResume() {
         super.onResume()
-        mapView.onResume()
+        map.onResume()
     }
 
     override fun onPause() {
         super.onPause()
-        mapView.onPause()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        mapView.onStop()
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        mapView.onLowMemory()
+        map.onPause()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mapView.onDestroy()
         _binding = null
     }
 }

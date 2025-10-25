@@ -1,10 +1,13 @@
 package com.example.smartbandiot
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.smartbandiot.databinding.ActivityMainBinding
@@ -29,27 +32,24 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        // ... (Kode Fragment Management dan Bottom Navigation Anda)
+        // 🔹 Tambahan: minta izin lokasi untuk fitur OSM (JoggingFragment)
+        requestLocationPermission()
 
+        // ... (Kode Fragment Management dan Bottom Navigation Anda)
         supportFragmentManager.addOnBackStackChangedListener {
             val currentFragment = supportFragmentManager.findFragmentById(R.id.container)
-            // Pastikan Anda telah mengimpor fragment-fragment ini: SettingsFragment, EditProfileFragment
-            val shouldHideNavbar = currentFragment is SettingsFragment || currentFragment is EditProfileFragment
+            val shouldHideNavbar =
+                currentFragment is SettingsFragment || currentFragment is EditProfileFragment
 
-            // Pastikan navigationMain adalah ID yang benar untuk Bottom Navigation View Anda
             binding.navigationMain.visibility = if (shouldHideNavbar) View.GONE else View.VISIBLE
         }
 
         if (savedInstanceState == null) {
-            // Pastikan Anda telah mengimpor fragment-fragment ini: HomeFragment
             supportFragmentManager.beginTransaction()
                 .replace(R.id.container, HomeFragment())
                 .commit()
-            // Asumsi bottomNavbarMainActivity memiliki ID home
             binding.bottomNavbarMainActivity.setItemSelected(R.id.home)
         }
-
-        // ... (Listener Bottom Navigation Anda)
 
         binding.bottomNavbarMainActivity.setOnItemSelectedListener { id ->
             when (id) {
@@ -59,9 +59,8 @@ class MainActivity : AppCompatActivity() {
                         .commit()
                 }
                 R.id.activity -> {
-                    // Jika ActivityFragment berbeda dari HomeFragment, ganti di sini!
                     supportFragmentManager.beginTransaction()
-                        .replace(R.id.container, HomeFragment()) // <-- PERHATIAN: Masih HomeFragment
+                        .replace(R.id.container, JoggingFragment())
                         .commit()
                 }
                 R.id.history -> {
@@ -74,25 +73,33 @@ class MainActivity : AppCompatActivity() {
                         .replace(R.id.container, UserProfileFragment())
                         .commit()
                 }
-                R.id.activity -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.container, JoggingFragment())
-                        .commit()
-                }
             }
+        }
+    }
+
+    // 🔹 Tambahan: Fungsi izin lokasi
+    private fun requestLocationPermission() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                100
+            )
         }
     }
 
     // Memeriksa Status Autentikasi Saat Activity Dimulai
     override fun onStart() {
         super.onStart()
-
-        // Jika pengguna tidak login (sesi hangus atau logout), kembalikan ke layar login
         val currentUser = auth.currentUser
         if (currentUser == null) {
-            val intent = Intent(this, LoginActivity::class.java) // Kembali ke Activity Login
+            val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
-            finish() // Tutup MainActivity
+            finish()
         }
     }
 }
