@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
 
     <application
@@ -26,27 +27,24 @@
             android:name=".PreferencesActivity"
             android:exported="false" />
         <activity
-            android:name=".Dashboard"
-            android:exported="false" />
-        <activity
             android:name=".PhoneVerivicationActivity"
             android:exported="false" />
         <activity
-            android:name=".LandingPage"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                android:name=".LandingPage"
+                android:exported="true">
+                <intent-filter>
+                    <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+                    <category android:name="android.intent.category.LAUNCHER" />
+                </intent-filter>
+            </activity>
 
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
         <meta-data
-            android:name="MAPTILER_API_KEY"
-            android:value="DVnoFiLkl3Lwtp4oksPi" />
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBlYor9UupUDPGYT9hX8Yp4benwrkSAIes" />
     </application>
 
 </manifest>
