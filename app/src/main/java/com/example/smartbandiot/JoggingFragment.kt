@@ -6,12 +6,8 @@ import android.graphics.Color
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.ImageButton
+import android.view.*
+import android.widget.*
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.example.smartbandiot.databinding.FragmentJoggingBinding
@@ -37,12 +33,16 @@ class JoggingFragment : Fragment() {
     private lateinit var database: FirebaseDatabase
     private lateinit var heartRateRef: DatabaseReference
     private lateinit var stepsRef: DatabaseReference
-    private lateinit var timestampRef: DatabaseReference
 
     private var pathOverlay: Polyline? = null
     private var lastLocation: GeoPoint? = null
     private var totalDistance = 0.0
-    private var joggingActive = true
+    private var joggingActive = false
+
+    private lateinit var panelStats: LinearLayout
+    private lateinit var heartRateText: TextView
+    private lateinit var stepsText: TextView
+    private lateinit var btnStartRun: Button
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,7 +51,6 @@ class JoggingFragment : Fragment() {
         _binding = FragmentJoggingBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        // ✅ Konfigurasi OSM
         Configuration.getInstance().load(
             requireContext(),
             PreferenceManager.getDefaultSharedPreferences(requireContext())
@@ -60,38 +59,48 @@ class JoggingFragment : Fragment() {
         map = binding.mapView
         map.setTileSource(TileSourceFactory.MAPNIK)
         map.setMultiTouchControls(true)
-        map.setBuiltInZoomControls(false) // kita bikin tombol custom sendiri
+        map.setBuiltInZoomControls(false)
         map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
 
         controller = map.controller
         controller.setZoom(17.0)
 
-        // ✅ Firebase setup
-        database =
-            FirebaseDatabase.getInstance("https://smartbandforteens-default-rtdb.firebaseio.com/")
+        // firebase
+        database = FirebaseDatabase.getInstance("https://smartbandforteens-default-rtdb.firebaseio.com/")
         heartRateRef = database.getReference("heartRate")
         stepsRef = database.getReference("steps")
-        timestampRef = database.getReference("timestamp")
+
+        // UI panel
+        panelStats = view.findViewById(R.id.panelStats)
+        panelStats.visibility = View.GONE
+
+        heartRateText = view.findViewById(R.id.txtHeart)
+        stepsText = view.findViewById(R.id.txtStep)
+        btnStartRun = view.findViewById(R.id.btnStartRun)
+
+        btnStartRun.setOnClickListener {
+            btnStartRun.visibility = View.GONE
+            panelStats.visibility = View.VISIBLE
+            joggingActive = true
+        }
 
         addFirebaseListeners()
         setupUserLocationTracking()
-        addCustomZoomButtons(view)
 
         return view
     }
 
-    // ------------------ 🔥 Firebase Listener ------------------
     private fun addFirebaseListeners() {
         heartRateRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val heartRate = snapshot.getValue(Int::class.java)
                 heartRate?.let {
-                    Log.d("JoggingFirebase", "❤️ Heart Rate: $it bpm")
+                    heartRateText.text = "Heart Rate: $it bpm"
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.e("JoggingFirebase", "Error reading heartRate: ${error.message}")
+                Log.e("JoggingFirebase", "heart error ${error.message}")
             }
         })
 
@@ -99,49 +108,35 @@ class JoggingFragment : Fragment() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val steps = snapshot.getValue(Int::class.java)
                 steps?.let {
-                    Log.d("JoggingFirebase", "👣 Steps: $it")
+                    stepsText.text = "Steps: $it"
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.e("JoggingFirebase", "Error reading steps: ${error.message}")
-            }
-        })
-
-        timestampRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val time = snapshot.getValue(String::class.java)
-                time?.let {
-                    Log.d("JoggingFirebase", "⏱ Timestamp: $it")
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.e("JoggingFirebase", "Error reading timestamp: ${error.message}")
+                Log.e("JoggingFirebase", "steps error ${error.message}")
             }
         })
     }
 
-    // ------------------ 🗺️ Lokasi & Tracking ------------------
     private fun setupUserLocationTracking() {
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
             == PackageManager.PERMISSION_GRANTED
         ) {
-            val locationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(requireContext()), map)
-            locationOverlay.enableMyLocation()
-            locationOverlay.enableFollowLocation()
-            map.overlays.add(locationOverlay)
+            val overlay = MyLocationNewOverlay(GpsMyLocationProvider(requireContext()), map)
+            overlay.enableMyLocation()
+            overlay.enableFollowLocation()
+            map.overlays.add(overlay)
 
             pathOverlay = Polyline()
             pathOverlay?.outlinePaint?.color = Color.BLUE
             pathOverlay?.outlinePaint?.strokeWidth = 8f
             map.overlays.add(pathOverlay)
 
-            locationOverlay.runOnFirstFix {
+            overlay.runOnFirstFix {
                 requireActivity().runOnUiThread {
-                    val myLoc = locationOverlay.myLocation
-                    if (myLoc != null) {
-                        val point = GeoPoint(myLoc.latitude, myLoc.longitude)
+                    val l = overlay.myLocation
+                    if (l != null) {
+                        val point = GeoPoint(l.latitude, l.longitude)
                         controller.setCenter(point)
                         lastLocation = point
                         pathOverlay?.addPoint(point)
@@ -149,14 +144,13 @@ class JoggingFragment : Fragment() {
                 }
             }
 
-            locationOverlay.myLocationProvider.startLocationProvider { location, _ ->
+            overlay.myLocationProvider.startLocationProvider { location, _ ->
                 if (location != null && joggingActive) {
                     requireActivity().runOnUiThread {
                         val newPoint = GeoPoint(location.latitude, location.longitude)
                         if (lastLocation != null) {
                             val distance = newPoint.distanceToAsDouble(lastLocation)
-                            totalDistance += distance / 1000.0
-                            Log.d("JoggingTrack", "Total distance: %.3f km".format(totalDistance))
+                            totalDistance += (distance / 1000.0)
                         }
                         lastLocation = newPoint
                         pathOverlay?.addPoint(newPoint)
@@ -169,57 +163,8 @@ class JoggingFragment : Fragment() {
         }
     }
 
-    // ------------------ 🔍 Tombol Zoom Custom ------------------
-    private fun addCustomZoomButtons(rootView: View) {
-        val context = requireContext()
-
-        val zoomIn = ImageButton(context).apply {
-            setImageResource(android.R.drawable.ic_input_add)
-            setBackgroundResource(android.R.drawable.btn_default)
-        }
-
-        val zoomOut = ImageButton(context).apply {
-            setImageResource(android.R.drawable.ic_input_delete)
-            setBackgroundResource(android.R.drawable.btn_default)
-        }
-
-        zoomIn.setOnClickListener { map.controller.zoomIn() }
-        zoomOut.setOnClickListener { map.controller.zoomOut() }
-
-        val layout = FrameLayout(context)
-        layout.addView(zoomIn)
-        layout.addView(zoomOut)
-
-        val paramsIn = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.WRAP_CONTENT,
-            FrameLayout.LayoutParams.WRAP_CONTENT
-        ).apply {
-            gravity = Gravity.END or Gravity.BOTTOM
-            setMargins(0, 0, 30, 200) // kanan, atas, bawah
-        }
-
-        val paramsOut = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.WRAP_CONTENT,
-            FrameLayout.LayoutParams.WRAP_CONTENT
-        ).apply {
-            gravity = Gravity.END or Gravity.BOTTOM
-            setMargins(0, 0, 30, 120)
-        }
-
-        layout.removeAllViews()
-        (rootView as FrameLayout).addView(zoomIn, paramsIn)
-        (rootView as FrameLayout).addView(zoomOut, paramsOut)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        map.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        map.onPause()
-    }
+    override fun onResume() { super.onResume(); map.onResume() }
+    override fun onPause() { super.onPause(); map.onPause() }
 
     override fun onDestroyView() {
         super.onDestroyView()
