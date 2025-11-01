@@ -72,7 +72,6 @@ class AgeFragment : Fragment() {
                 putString("age", age.toString())
                 apply()
             }
-            // --- AKHIR LOGIKA SIMPAN USIA ---
 
             findNavController().navigate(R.id.agetocreating)
         }
