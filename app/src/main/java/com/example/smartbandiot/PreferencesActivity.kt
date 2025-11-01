@@ -35,28 +35,28 @@ class PreferencesActivity : AppCompatActivity() {
                 R.id.Step1Gender -> {
                     binding.step.text = "Step 1 of 5"
                     binding.buttonback.visibility = View.GONE
-                    binding.skip.visibility = View.VISIBLE
+                    binding.skip.visibility = View.GONE
                 }
                 R.id.Step2MainGoal -> {
                     binding.step.text = "Step 2 of 5"
                     binding.buttonback.visibility = View.VISIBLE
-                    binding.skip.visibility = View.VISIBLE
+                    binding.skip.visibility = View.GONE
                 }
                 R.id.Step3Height -> {
                     binding.step.text = "Step 3 of 5"
                     binding.buttonback.visibility = View.VISIBLE
-                    binding.skip.visibility = View.VISIBLE
+                    binding.skip.visibility = View.GONE
                 }
                 R.id.Step4Weight -> {
                     binding.step.text = "Step 4 of 5"
                     binding.buttonback.visibility = View.VISIBLE
-                    binding.skip.visibility = View.VISIBLE
+                    binding.skip.visibility = View.GONE
                 }
                 R.id.Step5age -> {
                     binding.step.text = "Step 5 of 5"
                     binding.step.visibility = View.VISIBLE
                     binding.buttonback.visibility = View.VISIBLE
-                    binding.skip.visibility = View.VISIBLE
+                    binding.skip.visibility = View.GONE
                 }
                 R.id.CreatingPlan -> {
                     binding.step.visibility = View.GONE

@@ -54,8 +54,6 @@ class ChooseGenderFragment : Fragment() {
         binding.continu.setOnClickListener {
             val viewModel = ViewModelProvider(requireActivity())[PreferencesSharedViewModel::class.java]
             viewModel.gender = selectedGender.toString()
-
-            // --- LOGIKA PENYIMPANAN DATA PERMANEN KE SharedPreferences ---
             val sharedPref = requireContext().getSharedPreferences("user_profile", Context.MODE_PRIVATE)
             with(sharedPref.edit()) {
                 // 1. Simpan Gender
