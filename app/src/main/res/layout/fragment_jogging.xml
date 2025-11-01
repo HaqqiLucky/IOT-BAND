@@ -1,13 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:map="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/jogging_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Peta OSM -->
     <org.osmdroid.views.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <Button
+        android:id="@+id/btnStartRun"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_gravity="center"
+        android:text="START"
+        android:textStyle="bold"
+        android:textSize="22sp"
+        android:backgroundTint="#B8FF00"/>
+
+    <LinearLayout
+        android:id="@+id/panelStats"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="115dp"
+        android:padding="20dp"
+        android:background="@drawable/rounded_white"
+        android:visibility="gone">
+
+    <TextView
+            android:id="@+id/txtHeart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Heart Rate: -- bpm"
+            android:textSize="20sp"/>
+
+        <TextView
+            android:id="@+id/txtStep"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Steps: --"
+            android:textSize="20sp"/>
+
+    </LinearLayout>
 
 </FrameLayout>
