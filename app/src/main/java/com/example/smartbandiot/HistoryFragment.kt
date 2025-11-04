@@ -7,68 +7,92 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import com.google.android.material.card.MaterialCardView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
+import java.text.SimpleDateFormat
+import java.util.*
+
+data class HistoryItem(
+    val timestamp: Long = 0,
+    val heart_rate: Int = 0,
+    val steps: Int = 0
+)
 
 class HistoryFragment : Fragment() {
 
     private lateinit var btnBack: ImageButton
-    private lateinit var tvViewAll: TextView
-    private lateinit var cardYesterday: MaterialCardView
-    private lateinit var tvYesterdayBpm: TextView
+    private lateinit var rvHistory: RecyclerView
+    private lateinit var adapter: HistoryAdapter
+
+    private lateinit var database: FirebaseDatabase
+    private lateinit var historyRef: DatabaseReference
+    private var uid: String = ""
+    private val listHistory = ArrayList<HistoryItem>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_history, container, false)
+        val v = inflater.inflate(R.layout.fragment_history, container, false)
 
-        // Inisialisasi views
-        initViews(view)
+        uid = FirebaseAuth.getInstance().currentUser!!.uid
+        database = FirebaseDatabase.getInstance("https://smartbandforteens-default-rtdb.asia-southeast1.firebasedatabase.app/")
+        historyRef = database.getReference("history").child(uid)
 
-        // Setup click listeners
-        setupClickListeners()
+        btnBack = v.findViewById(R.id.btnBack)
+        rvHistory = v.findViewById(R.id.rvHistory)
 
-        // Load data
-        loadData()
+        rvHistory.layoutManager = LinearLayoutManager(requireContext())
+        adapter = HistoryAdapter(listHistory)
+        rvHistory.adapter = adapter
 
-        return view
+        btnBack.setOnClickListener { parentFragmentManager.popBackStack() }
+
+        loadHistory()
+        return v
     }
 
-    private fun initViews(view: View) {
-        btnBack = view.findViewById(R.id.btnBack)
-        tvViewAll = view.findViewById(R.id.tvViewAll)
-        cardYesterday = view.findViewById(R.id.cardYesterday)
-        tvYesterdayBpm = view.findViewById(R.id.tvYesterdayBpm)
+    private fun loadHistory() {
+        historyRef.orderByChild("timestamp").addValueEventListener(object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                listHistory.clear()
+                for(item in snapshot.children) {
+                    val data = item.getValue(HistoryItem::class.java)
+                    data?.let { listHistory.add(it) }
+                }
+                listHistory.reverse() // newest top
+                adapter.notifyDataSetChanged()
+            }
+
+            override fun onCancelled(error: DatabaseError) {}
+        })
+    }
+}
+
+class HistoryAdapter(val items: ArrayList<HistoryItem>): RecyclerView.Adapter<HistoryVH>() {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryVH {
+        val v = LayoutInflater.from(parent.context).inflate(R.layout.item_history_run, parent, false)
+        return HistoryVH(v)
     }
 
-    private fun setupClickListeners() {
-        // Back button
-        btnBack.setOnClickListener {
-            parentFragmentManager.popBackStack()
-        }
+    override fun getItemCount() = items.size
 
-        // View All button
-        tvViewAll.setOnClickListener {
-            navigateToDetail()
-        }
+    override fun onBindViewHolder(holder: HistoryVH, position: Int) = holder.bind(items[position])
+}
 
-        // Yesterday Card - klik untuk detail
-        cardYesterday.setOnClickListener {
-            navigateToDetail()
-        }
-    }
+class HistoryVH(v: View): RecyclerView.ViewHolder(v) {
 
-    private fun navigateToDetail() {
-        // Navigasi ke HeartRateDetailFragment
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.container, HeartRateDetailFragment())
-            .addToBackStack("analytics")
-            .commit()
-    }
+    private val tvDate = v.findViewById<TextView>(R.id.tvDate)
+    private val tvHeart = v.findViewById<TextView>(R.id.tvHeart)
+    private val tvSteps = v.findViewById<TextView>(R.id.tvSteps)
 
-    private fun loadData() {
-        // TODO: Load data dari database atau API
-        // Untuk sementara gunakan data dummy
-        tvYesterdayBpm.text = "102"
+    fun bind(item: HistoryItem) {
+        val sdf = SimpleDateFormat("dd MMM yyyy - HH:mm", Locale.getDefault())
+        tvDate.text = sdf.format(Date(item.timestamp))
+        tvHeart.text = "Heart Rate: ${item.heart_rate} bpm"
+        tvSteps.text = "Steps: ${item.steps}"
     }
 }

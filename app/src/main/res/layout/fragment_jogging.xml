@@ -47,6 +47,16 @@
             android:text="Steps: --"
             android:textSize="20sp"/>
 
+        <Button
+            android:id="@+id/btnStopRun"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="STOP"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:backgroundTint="#FF4C4C"
+            android:layout_marginTop="14dp"/>
+
     </LinearLayout>
 
 </FrameLayout>
