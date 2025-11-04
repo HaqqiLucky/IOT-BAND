@@ -51,7 +51,7 @@
             android:id="@+id/btnStopRun"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:text="STOP"
+            android:text="FINISH"
             android:textStyle="bold"
             android:textSize="18sp"
             android:backgroundTint="#FF4C4C"
