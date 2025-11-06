@@ -43,4 +43,39 @@
         android:paddingTop="8dp"
         android:paddingBottom="24dp" />
 
+    <LinearLayout
+        android:id="@+id/panelRPE"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:background="#DD000000"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/btnVeryTired"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sangat Lelah"
+            android:textColor="@android:color/white"/>
+
+        <Button
+            android:id="@+id/btnTired"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lelah"
+            android:layout_marginStart="16dp"
+            android:textColor="@android:color/white"/>
+
+        <Button
+            android:id="@+id/btnNotTired"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tidak Lelah"
+            android:layout_marginStart="16dp"
+            android:textColor="@android:color/white"/>
+    </LinearLayout>
+
 </LinearLayout>
