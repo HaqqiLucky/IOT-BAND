@@ -68,12 +68,23 @@ class HistoryFragment : Fragment() {
         return v
     }
 
-    private fun setRPEValue(rpe: String){
-        latestHistoryId?.let {
-            historyRef.child(it).child("rpe_status").setValue(rpe)
+    private fun setRPEValue(rpe: String) {
+        latestHistoryId?.let { id ->
+            historyRef.child(id).child("rpe_status").setValue(rpe)
+
+            // buat challange untuk home
+            val userRef = database.getReference("users").child(uid).child("today_challenge")
+            val push = mapOf(
+                "rpe" to rpe,
+                "created_at" to System.currentTimeMillis(),
+                "status" to "active"
+            )
+            userRef.setValue(push)
+
             panelRPE.visibility = View.GONE
         }
     }
+
 
 
 
