@@ -66,12 +66,12 @@ class HomeFragment : Fragment() {
                 if(snapshot.exists()){
                     val rpe = snapshot.child("rpe").getValue(String::class.java) ?: ""
 
-                    val challengeList = ArrayList<HistoryActivityItemData>()
+                    val challengeList = ArrayList<ChallengeItemData>()
 
                     val challenge = when(rpe){
-                        "Very Tired" -> HistoryActivityItemData("Recovery Run", 1800, 2.0)
-                        "Tired" -> HistoryActivityItemData("Light Jog", 2500, 4.0)
-                        else -> HistoryActivityItemData("Tempo Challenge", 3000, 6.0)
+                        "Very Tired" -> ChallengeItemData("Recovery Run", 1800, 2.0)
+                        "Tired" -> ChallengeItemData("Light Jog", 2500, 4.0)
+                        else -> ChallengeItemData("Tempo Challenge", 3000, 6.0)
                     }
 
                     challengeList.add(challenge)

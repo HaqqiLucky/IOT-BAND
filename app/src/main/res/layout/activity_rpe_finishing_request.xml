@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:background="#FFFFFF"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RpeFinishingRequestActivity">
+
+    <LinearLayout
+        android:id="@+id/content_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/continu">
+
+        <TextView
+            android:layout_marginTop="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins_semibold"
+            android:textSize="25.98dp"
+            android:gravity="center"
+            android:text="Customizing the plan" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-10dp"
+            android:fontFamily="@font/poppins_semibold"
+            android:textSize="25.98dp"
+            android:gravity="center"
+            android:layout_marginBottom="40dp"
+            android:text="for next session" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.mikhaellopez.circularprogressbar.CircularProgressBar
+                android:id="@+id/circularProgressBar"
+                android:layout_width="259.78dp"
+                android:layout_height="259.79dp"
+                android:layout_gravity="center"
+                app:cpb_background_progressbar_color="@color/putih_loading"
+                app:cpb_background_progressbar_width="20dp"
+                app:cpb_progress_direction="to_right"
+                app:cpb_progressbar_color="@color/green_app_theme"
+                app:cpb_progressbar_width="20dp"
+                app:cpb_round_border="true" />
+
+            <TextView
+                android:id="@+id/persenanloading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0%"
+                android:layout_gravity="center"
+                android:textSize="50sp"
+                android:fontFamily="@font/poppins_bold"/>
+
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Your exercise's plan will be customized \nbased on your choose"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:layout_marginTop="50dp"
+            android:textSize="15.4sp"
+            android:fontFamily="@font/opensans_regular"/>
+
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/continu"
+        android:layout_width="match_parent"
+        android:layout_height="53dp"
+        android:text="Done"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginBottom="50dp"
+        app:cornerRadius="5dp"
+        app:backgroundTint="@color/enable_disable"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
