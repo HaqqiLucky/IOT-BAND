@@ -9,7 +9,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.smartbandiot.databinding.FragmentHomeBinding
 import com.google.firebase.auth.FirebaseAuth
 import java.time.LocalTime
-import kotlin.random.Random
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+
 
 private val user = FirebaseAuth.getInstance().currentUser
 
@@ -52,70 +55,48 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val myDataList = generateDummyList(15) // Menggunakan fungsi dummy
-        val db = com.google.firebase.database.FirebaseDatabase
+
+        val uid = FirebaseAuth.getInstance().currentUser!!.uid
+        val userRef = com.google.firebase.database.FirebaseDatabase
             .getInstance("https://smartbandforteens-default-rtdb.asia-southeast1.firebasedatabase.app/")
+            .getReference("users").child(uid).child("today_challenge")
 
-        val heartRateRef = db.getReference("data_iot").child("device_001").child("heart_rate")
+        userRef.addValueEventListener(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if(snapshot.exists()){
+                    val rpe = snapshot.child("rpe").getValue(String::class.java) ?: ""
 
-        heartRateRef.addValueEventListener(object: com.google.firebase.database.ValueEventListener {
-            override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
-                val hr = snapshot.getValue(Int::class.java) ?: 0
-                binding.txtLiveHeartRateHome.text = "$hr bpm"
+                    val challengeList = ArrayList<HistoryActivityItemData>()
+
+                    val challenge = when(rpe){
+                        "Very Tired" -> HistoryActivityItemData("Recovery Run", 1800, 2.0)
+                        "Tired" -> HistoryActivityItemData("Light Jog", 2500, 4.0)
+                        else -> HistoryActivityItemData("Tempo Challenge", 3000, 6.0)
+                    }
+
+                    challengeList.add(challenge)
+
+                    val adapter = ActivitiesHomeAdapter(challengeList)
+                    binding.resaikelviewHome.apply {
+                        layoutManager = LinearLayoutManager(requireContext())
+                        this.adapter = adapter
+                    }
+                } else {
+                    binding.resaikelviewHome.adapter = ActivitiesHomeAdapter(ArrayList())
+                }
             }
 
-            override fun onCancelled(error: com.google.firebase.database.DatabaseError) {}
+            override fun onCancelled(error: DatabaseError) {}
         })
 
-        // 2. Inisialisasi Adapter
-        // Pastikan Anda telah mendefinisikan MyAdapter dan ItemData
-        val adapter = ActivitiesHomeAdapter(myDataList)
-        binding.resaikelviewHome.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            this.adapter = adapter
-            setHasFixedSize(true)
-        }
 
         bonjourHuman()
     }
 
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private fun generateDummyList(size: Int): List<HistoryActivityItemData> {
-        val list = ArrayList<HistoryActivityItemData>()
-        val activityTypes = listOf("Lari Pagi", "Bersepeda Santai", "Jalan Kaki Cepat", "Hiking", "Sprint Interval")
-        val random = Random.Default
-
-        for (i in 0 until size) {
-            // 1. Tentukan Jarak Acak (antara 1.0 km hingga 15.0 km)
-            val distance = random.nextDouble(1.0, 15.0)
-
-            // 2. Tentukan Waktu Acak (antara 20 menit hingga 2 jam)
-            // Kita hitung dalam detik (Int)
-            // Min 20 menit = 1200 detik. Max 120 menit = 7200 detik.
-            val minTimeSec = 1200
-            val maxTimeSec = 7200
-            val time = random.nextInt(minTimeSec, maxTimeSec)
-
-            // 3. Tentukan Judul Acak
-            // Mengambil judul acak dari daftar activityTypes
-            val title = activityTypes.random()
-
-            // 4. Buat objek data baru dan tambahkan ke daftar
-            // Kita tidak perlu mengisi 'date' karena ia memiliki default = System.currentTimeMillis()
-            list.add(
-                HistoryActivityItemData(
-                    title = title,
-                    timeInSec = time,
-                    distanceKm = distance
-                    // date akan menggunakan nilai default (waktu saat ini)
-                )
-            )
-        }
-        return list
     }
 
     private fun bonjourHuman(){

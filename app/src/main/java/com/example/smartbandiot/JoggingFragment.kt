@@ -34,7 +34,6 @@ class JoggingFragment : Fragment() {
     private lateinit var database: FirebaseDatabase
     private lateinit var heartRateRef: DatabaseReference
     private lateinit var stepsRef: DatabaseReference
-    private lateinit var historyRef: DatabaseReference
 
     private var pathOverlay: Polyline? = null
     private var lastLocation: GeoPoint? = null
@@ -45,16 +44,28 @@ class JoggingFragment : Fragment() {
     private lateinit var heartRateText: TextView
     private lateinit var stepsText: TextView
     private lateinit var btnStartRun: Button
-    private lateinit var btnStopRun: Button
 
-    private var lastSteps = 0
-    private var lastHeartRate = 0
+    private var hrMaxLimit = 0.0
+    private var hrMinLimit = 0.0
+    private var lastWarningTime = 0L
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentJoggingBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        Configuration.getInstance().load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
+        Configuration.getInstance().load(
+            requireContext(),
+            PreferenceManager.getDefaultSharedPreferences(requireContext())
+        )
+
+        database = FirebaseDatabase.getInstance("https://smartbandforteens-default-rtdb.asia-southeast1.firebasedatabase.app/")
+
+        val uid = FirebaseAuth.getInstance().currentUser!!.uid
+        heartRateRef = database.getReference("data_iot").child("device_001").child("heart_rate")
+        stepsRef = database.getReference("data_iot").child("device_001").child("steps")
 
         map = binding.mapView
         map.setTileSource(TileSourceFactory.MAPNIK)
@@ -65,90 +76,121 @@ class JoggingFragment : Fragment() {
         controller = map.controller
         controller.setZoom(17.0)
 
-        database = FirebaseDatabase.getInstance("https://smartbandforteens-default-rtdb.asia-southeast1.firebasedatabase.app/")
-        heartRateRef = database.getReference("data_iot/device_001/heart_rate")
-        stepsRef = database.getReference("data_iot/device_001/steps")
-        val uid = FirebaseAuth.getInstance().currentUser!!.uid
-        historyRef = database.getReference("history").child(uid)
-
         panelStats = view.findViewById(R.id.panelStats)
         panelStats.visibility = View.GONE
 
         heartRateText = view.findViewById(R.id.txtHeart)
         stepsText = view.findViewById(R.id.txtStep)
         btnStartRun = view.findViewById(R.id.btnStartRun)
-        btnStopRun = view.findViewById(R.id.btnStopRun)
 
         btnStartRun.setOnClickListener {
-            // reset realtime data agar starting clean
-            stepsRef.setValue(0)
-            heartRateRef.setValue(0)
-
-            totalDistance = 0.0
-            lastLocation = null
-
             btnStartRun.visibility = View.GONE
             panelStats.visibility = View.VISIBLE
             joggingActive = true
         }
 
-
+        val btnStopRun = view.findViewById<Button>(R.id.btnStopRun)
         btnStopRun.setOnClickListener {
             joggingActive = false
 
-            // SAVE HISTORY
-            val historyId = historyRef.push().key ?: System.currentTimeMillis().toString()
+            val uid = FirebaseAuth.getInstance().currentUser!!.uid
+            val ref = database.getReference("history").child(uid).push()
 
-            val dataSave = mapOf(
-                "heart_rate" to lastHeartRate,
-                "steps" to lastSteps,
+            val heart = heartRateText.text.toString()
+                .replace("Heart Rate: ","")
+                .replace(" bpm","")
+                .toIntOrNull() ?: 0
+
+            val step = stepsText.text.toString()
+                .replace("Steps: ","")
+                .toIntOrNull() ?: 0
+
+            val data = mapOf(
+                "timestamp" to System.currentTimeMillis(),
+                "heart_rate" to heart,
+                "steps" to step,
                 "distance_km" to totalDistance,
-                "timestamp" to System.currentTimeMillis()
+                "rpe_status" to "pending"
             )
 
-            historyRef.child(historyId).setValue(dataSave)
 
-            // RESET step di firebase realtime
-            stepsRef.setValue(0)
+            ref.setValue(data)
 
-            // UI reset
-            panelStats.visibility = View.GONE
-            btnStartRun.visibility = View.VISIBLE
+            Toast.makeText(requireContext(),"Aktivitas disimpan!",Toast.LENGTH_SHORT).show()
+
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.container, HistoryFragment())
+                    .addToBackStack(null)
+                    .commit()
+            },400)
         }
 
+
+            loadUserHRLimit(uid)
         addFirebaseListeners()
         setupUserLocationTracking()
 
         return view
     }
 
-    private fun addFirebaseListeners() {
-        heartRateRef.addValueEventListener(object : ValueEventListener {
+    private fun loadUserHRLimit(uid:String) {
+        val prefRef = database.getReference("users_personal_preferences")
+            .child(uid).child("hasilRulebase").child("HrTarget")
+
+        prefRef.addListenerForSingleValueEvent(object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
-                val hr = snapshot.getValue(Int::class.java)
-                hr?.let {
-                    lastHeartRate = it
-                    heartRateText.text = "Heart Rate: $it bpm"
+                val range = snapshot.getValue(String::class.java) ?: return
+                val parts = range.split("..")
+                if(parts.size == 2){
+                    hrMinLimit = parts[0].toDouble()
+                    hrMaxLimit = parts[1].toDouble()
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {}
+        })
+    }
+
+    private fun addFirebaseListeners() {
+
+        heartRateRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val heartRate = snapshot.getValue(Int::class.java)
+                heartRate?.let {
+                    heartRateText.text = "Heart Rate: $it bpm"
+
+                    if(joggingActive && hrMaxLimit > 0 && it > hrMaxLimit){
+                        val now = System.currentTimeMillis()
+                        if(now - lastWarningTime > 7000){ // 7s anti spam
+                            lastWarningTime = now
+                            Toast.makeText(requireContext(), "⚠️ Heart Rate kamu melewati batas aman! Turunkan tempo sedikit.", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("JoggingFirebase", "heart error ${error.message}")
+            }
         })
 
         stepsRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val steps = snapshot.getValue(Int::class.java)
-                steps?.let {
-                    lastSteps = it
-                    stepsText.text = "Steps: $it"
-                }
+                steps?.let { stepsText.text = "Steps: $it" }
             }
-            override fun onCancelled(error: DatabaseError) {}
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("JoggingFirebase", "steps error ${error.message}")
+            }
         })
     }
 
     private fun setupUserLocationTracking() {
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
             val overlay = MyLocationNewOverlay(GpsMyLocationProvider(requireContext()), map)
             overlay.enableMyLocation()
             overlay.enableFollowLocation()
@@ -192,5 +234,9 @@ class JoggingFragment : Fragment() {
 
     override fun onResume() { super.onResume(); map.onResume() }
     override fun onPause() { super.onPause(); map.onPause() }
-    override fun onDestroyView() { super.onDestroyView(); _binding = null }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }
