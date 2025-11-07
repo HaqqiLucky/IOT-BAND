@@ -120,7 +120,7 @@ class JoggingFragment : Fragment() {
 
             android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                 parentFragmentManager.beginTransaction()
-                    .replace(R.id.container, HistoryFragment())
+                    .replace(R.id.container, RecapFragment())
                     .addToBackStack(null)
                     .commit()
             },400)

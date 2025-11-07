@@ -5,10 +5,10 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
 
-data class HistoryActivityItemData(
+data class ChallengeItemData(
     val title: String,
     val timeInSec: Int,
-    val distanceKm: Double,
+    val distanceKm: Double = GlobalData.distanceTargetNextSession,
     val date: Long = System.currentTimeMillis()
 ) {
     val pace: Double

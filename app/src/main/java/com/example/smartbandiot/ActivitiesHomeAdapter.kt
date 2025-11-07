@@ -8,14 +8,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 
 class ActivitiesHomeAdapter(
-    private val dataList: List<HistoryActivityItemData>,
+    private val dataList: List<ChallengeItemData>,
     private val onChallengeFinished: (() -> Unit)? = null
 ) : RecyclerView.Adapter<ActivitiesHomeAdapter.BindingViewHolder>() {
 
     inner class BindingViewHolder(val binding: ItemChallengeBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: HistoryActivityItemData) {
+        fun bind(item: ChallengeItemData) {
             binding.date.text = item.formattedDate
             binding.title.text = item.title
             binding.time.text = item.formattedTime
