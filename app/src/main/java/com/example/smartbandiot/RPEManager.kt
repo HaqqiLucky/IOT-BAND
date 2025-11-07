@@ -3,20 +3,34 @@ package com.example.smartbandiot
 import android.util.Log
 import com.google.firebase.database.FirebaseDatabase
 
-class RPEManager {
+class RPEManager(val uid:String) {
 
-    private val database = FirebaseDatabase.getInstance("https://smartbandforteens-default-rtdb.firebaseio.com/")
+    private val database = FirebaseDatabase.getInstance("https://smartbandforteens-default-rtdb.asia-southeast1.firebasedatabase.app/")
     private val ruleRef = database.getReference("rulebase")
+    private val userChallengeRef = database.getReference("users").child(uid).child("today_challenge")
 
-    // Fungsi untuk update target Km berdasarkan RPE
-    fun updateTarget(currentKm: Double, rpeValue: Int): Double {
-        var newKm = currentKm
-        when {
-            rpeValue <= 3 -> newKm += currentKm * 0.015  // too easy
-            rpeValue >= 8 -> newKm -= currentKm * 0.005  // too hard
+    fun convertStringToRPE(rpeText:String): Int {
+        return when(rpeText){
+            "Very Tired" -> 9
+            "Tired" -> 7
+            "Normal" -> 5
+            "Easy" -> 3
+            "Very Easy" -> 1
+            else -> 5
         }
-        Log.d("RPEManager", "RPE: $rpeValue, New Target Km: $newKm")
+    }
+
+    fun updateTarget(currentKm: Double, rpeText:String): Double {
+        val rpeValue = convertStringToRPE(rpeText)
+        var newKm = currentKm
+
+        when {
+            rpeValue <= 3 -> newKm += currentKm * 0.015
+            rpeValue >= 8 -> newKm -= currentKm * 0.005
+        }
+
         saveToDatabase(newKm, rpeValue)
+        userChallengeRef.child("target_km_next").setValue(newKm)
         return newKm
     }
 
