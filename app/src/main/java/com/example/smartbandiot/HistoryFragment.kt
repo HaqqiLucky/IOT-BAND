@@ -19,8 +19,11 @@ import java.util.*
 data class HistoryItem(
     val timestamp: Long = 0,
     val heart_rate: Int = 0,
-    val steps: Int = 0
+    val steps: Int = 0,
+    val distance_km: Double = 0.0,
+    val rpe_status: String? = "pending"
 )
+
 
 class HistoryFragment : Fragment() {
 
@@ -60,10 +63,16 @@ class HistoryFragment : Fragment() {
 
         btnBack.setOnClickListener { parentFragmentManager.popBackStack() }
 
+        panelRPE = v.findViewById(R.id.panelRPE)
+        btnVeryTired = v.findViewById(R.id.btnVeryTired)
+        btnTired = v.findViewById(R.id.btnTired)
+        btnNotTired = v.findViewById(R.id.btnNotTired)
+
         btnVeryTired.setOnClickListener { setRPEValue("Very Tired") }
         btnTired.setOnClickListener { setRPEValue("Tired") }
-        btnNotTired.setOnClickListener { setRPEValue("Not Tired") }
+        btnNotTired.setOnClickListener { setRPEValue("Normal") }
 
+// ini baru boleh loadHistory()
         loadHistory()
         return v
     }

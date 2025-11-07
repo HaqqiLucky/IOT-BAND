@@ -89,7 +89,45 @@ class JoggingFragment : Fragment() {
             joggingActive = true
         }
 
-        loadUserHRLimit(uid)
+        val btnStopRun = view.findViewById<Button>(R.id.btnStopRun)
+        btnStopRun.setOnClickListener {
+            joggingActive = false
+
+            val uid = FirebaseAuth.getInstance().currentUser!!.uid
+            val ref = database.getReference("history").child(uid).push()
+
+            val heart = heartRateText.text.toString()
+                .replace("Heart Rate: ","")
+                .replace(" bpm","")
+                .toIntOrNull() ?: 0
+
+            val step = stepsText.text.toString()
+                .replace("Steps: ","")
+                .toIntOrNull() ?: 0
+
+            val data = mapOf(
+                "timestamp" to System.currentTimeMillis(),
+                "heart_rate" to heart,
+                "steps" to step,
+                "distance_km" to totalDistance,
+                "rpe_status" to "pending"
+            )
+
+
+            ref.setValue(data)
+
+            Toast.makeText(requireContext(),"Aktivitas disimpan!",Toast.LENGTH_SHORT).show()
+
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.container, HistoryFragment())
+                    .addToBackStack(null)
+                    .commit()
+            },400)
+        }
+
+
+            loadUserHRLimit(uid)
         addFirebaseListeners()
         setupUserLocationTracking()
 
