@@ -53,6 +53,19 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val myDataList = generateDummyList(15) // Menggunakan fungsi dummy
+        val db = com.google.firebase.database.FirebaseDatabase
+            .getInstance("https://smartbandforteens-default-rtdb.asia-southeast1.firebasedatabase.app/")
+
+        val heartRateRef = db.getReference("data_iot").child("device_001").child("heart_rate")
+
+        heartRateRef.addValueEventListener(object: com.google.firebase.database.ValueEventListener {
+            override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
+                val hr = snapshot.getValue(Int::class.java) ?: 0
+                binding.txtLiveHeartRateHome.text = "$hr bpm"
+            }
+
+            override fun onCancelled(error: com.google.firebase.database.DatabaseError) {}
+        })
 
         // 2. Inisialisasi Adapter
         // Pastikan Anda telah mendefinisikan MyAdapter dan ItemData
