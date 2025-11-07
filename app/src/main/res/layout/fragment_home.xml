@@ -46,13 +46,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Select Device"
+                android:text="Live Heart Rate"
                 android:layout_marginTop="12dp"
                 android:layout_marginLeft="20dp"
                 android:fontFamily="@font/inter_regular"
                 android:textSize="14sp"/>
 
             <TextView
+                android:id="@+id/txtLiveHeartRateHome"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="28sp"
@@ -60,7 +61,7 @@
                 android:layout_marginLeft="20dp"
                 android:fontFamily="@font/poppins_semibold"
                 android:textColor="@color/no_device_red"
-                android:text="No Device"/>
+                android:text="-- bpm"/>
 
         </androidx.cardview.widget.CardView>
 
