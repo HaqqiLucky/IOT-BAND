@@ -27,6 +27,7 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import kotlin.math.max
 
 class JoggingFragment : Fragment() {
 
@@ -54,6 +55,10 @@ class JoggingFragment : Fragment() {
     private var hrMinLimit = 0.0
     private var lastWarningTime = 0L
 
+    // --- NEW: baseline logic ---
+    private var baseSteps: Int? = null   // nilai steps saat user menekan "Mulai"
+    private var rawStepsLatest: Int = 0 // nilai mentah terakhir dari IoT
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -73,7 +78,7 @@ class JoggingFragment : Fragment() {
 
         val uid = FirebaseAuth.getInstance().currentUser!!.uid
 
-        // 🔹 Pastikan reference ke node yang benar
+        // Pastikan reference ke node yang benar (field tunggal)
         heartRateRef = database.getReference("data_iot/device_001/heart_rate")
         stepsRef = database.getReference("data_iot/device_001/steps")
 
@@ -94,25 +99,50 @@ class JoggingFragment : Fragment() {
         stepsText = view.findViewById(R.id.txtStep)
         btnStartRun = view.findViewById(R.id.btnStartRun)
 
-        // Tombol Mulai
+        // Tombol Mulai: set baseline (bukan menimpa IoT)
         btnStartRun.setOnClickListener {
             if (joggingActive) {
                 Toast.makeText(requireContext(), "Jogging sedang berjalan!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            resetStepsCounterOnly() // ✅ hanya reset langkah
+            // Ambil nilai langkah saat ini dari Firebase sebagai baseline
+            stepsRef.get().addOnSuccessListener { snap ->
+                val raw = snap.getValue(Int::class.java) ?: 0
+                baseSteps = raw
+                Log.d("JoggingFragment", "Baseline langkah ditetapkan: $baseSteps")
 
-            totalDistance = 0.0
-            lastLocation = null
-            pathOverlay?.points?.clear()
-            map.invalidate()
+                // Reset local tracking
+                totalDistance = 0.0
+                lastLocation = null
+                pathOverlay?.points?.clear()
+                map.invalidate()
 
-            btnStartRun.visibility = View.GONE
-            panelStats.visibility = View.VISIBLE
-            joggingActive = true
+                btnStartRun.visibility = View.GONE
+                panelStats.visibility = View.VISIBLE
+                joggingActive = true
 
-            Toast.makeText(requireContext(), "🏃‍♂️ Jogging dimulai! Langkah direset.", Toast.LENGTH_SHORT).show()
+                // Update UI segera (mulai dari 0)
+                updateStepsDisplay()
+
+                Toast.makeText(requireContext(), "🏃‍♂️ Jogging dimulai! Langkah mulai dihitung dari 0.", Toast.LENGTH_SHORT).show()
+            }.addOnFailureListener {
+                // jika gagal baca baseline, pakai rawStepsLatest sebagai fallback
+                baseSteps = rawStepsLatest
+                Log.w("JoggingFragment", "Gagal baca baseline, fallback ke latest: $baseSteps")
+                // lanjutkan sama seperti di atas
+                totalDistance = 0.0
+                lastLocation = null
+                pathOverlay?.points?.clear()
+                map.invalidate()
+
+                btnStartRun.visibility = View.GONE
+                panelStats.visibility = View.VISIBLE
+                joggingActive = true
+
+                updateStepsDisplay()
+                Toast.makeText(requireContext(), "🏃‍♂️ Jogging dimulai! (fallback baseline).", Toast.LENGTH_SHORT).show()
+            }
         }
 
         // Tombol Stop
@@ -124,38 +154,41 @@ class JoggingFragment : Fragment() {
             }
 
             joggingActive = false
-            val uid = FirebaseAuth.getInstance().currentUser!!.uid
-            val ref = database.getReference("history").child(uid).push()
 
+            val uidStop = FirebaseAuth.getInstance().currentUser!!.uid
+            val ref = database.getReference("history").child(uidStop).push()
+
+            // Hitung steps relatif berdasarkan baseline
+            val displaySteps = if (baseSteps != null) max(0, rawStepsLatest - baseSteps!!) else rawStepsLatest
             val heart = heartRateText.text.toString()
                 .replace("Heart Rate: ", "")
                 .replace(" bpm", "")
                 .toIntOrNull() ?: 0
 
-            val step = stepsText.text.toString()
-                .replace("Steps: ", "")
-                .toIntOrNull() ?: 0
-
-            // Jika GPS tidak aktif, hitung dari langkah
+            // Jika langkah relatif belum ada/0, masih gunakan rawStepsLatest (atau totalDistance)
+            val stepToSave = displaySteps
             var distance = totalDistance
-            if (distance <= 0.0 && step > 0) {
-                distance = (step * 0.78) / 1000.0 // fallback ke jarak langkah
+            if (distance <= 0.0 && stepToSave > 0) {
+                distance = (stepToSave * 0.78) / 1000.0 // fallback ke jarak langkah
             }
 
             val data = mapOf(
                 "timestamp" to System.currentTimeMillis(),
                 "heart_rate" to heart,
-                "steps" to step,
+                "steps" to stepToSave,
                 "distance_km" to distance,
                 "rpe_status" to "pending"
             )
 
             ref.setValue(data)
-            Log.d("JoggingFragment", "Saved: HR=$heart | Step=$step | Distance=$distance")
+            Log.d("JoggingFragment", "Saved: HR=$heart | Step=$stepToSave | Distance=$distance")
 
             Toast.makeText(requireContext(), "Aktivitas disimpan!", Toast.LENGTH_SHORT).show()
 
-            // Pindah ke recap setelah simpan
+            // reset baseline supaya sesi berikutnya tidak terkunci ke baseline lama
+            baseSteps = null
+
+            // Kembali ke Recap
             android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.container, RecapFragment())
@@ -171,19 +204,13 @@ class JoggingFragment : Fragment() {
         return view
     }
 
-    /** ✅ Reset hanya langkah, bukan heart rate */
-    private fun resetStepsCounterOnly() {
-        database.getReference("data_iot/device_001/steps")
-            .setValue(0)
-            .addOnSuccessListener {
-                Log.d("JoggingFragment", "✅ Steps direset ke 0 (heart_rate tidak disentuh).")
-            }
-            .addOnFailureListener {
-                Log.e("JoggingFragment", "❌ Gagal reset langkah: ${it.message}")
-            }
+    // --- update displayed steps berdasarkan rawStepsLatest & baseSteps ---
+    private fun updateStepsDisplay() {
+        val display = if (baseSteps != null) max(0, rawStepsLatest - baseSteps!!) else rawStepsLatest
+        stepsText.text = "Steps: $display"
     }
 
-    /** 🔹 Ambil batas HR user dari hasil rulebase */
+    /** Ambil batas HR user dari hasil rulebase */
     private fun loadUserHRLimit(uid: String) {
         val prefRef = database.getReference("users_personal_preferences")
             .child(uid).child("hasilRulebase").child("HrTarget")
@@ -205,7 +232,7 @@ class JoggingFragment : Fragment() {
         })
     }
 
-    /** 🔹 Listener real-time IoT */
+    /** Listener real-time IoT */
     private fun addFirebaseListeners() {
         heartRateRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -234,10 +261,9 @@ class JoggingFragment : Fragment() {
 
         stepsRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val steps = snapshot.getValue(Int::class.java)
-                steps?.let {
-                    stepsText.text = "Steps: $it"
-                }
+                val steps = snapshot.getValue(Int::class.java) ?: 0
+                rawStepsLatest = steps
+                updateStepsDisplay()
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -246,7 +272,7 @@ class JoggingFragment : Fragment() {
         })
     }
 
-    /** 🔹 GPS Tracking */
+    /** GPS Tracking */
     private fun setupUserLocationTracking() {
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
