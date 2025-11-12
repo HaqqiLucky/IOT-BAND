@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import com.example.smartbandiot.databinding.FragmentRecapBinding
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.database
+import com.google.firebase.database.*
 
 class RecapFragment : Fragment() {
 
@@ -29,69 +29,81 @@ class RecapFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
-        val auth = FirebaseAuth.getInstance()
-        val uid = auth.currentUser?.uid ?: return
-
-        userRPE.limitToLast(1).get()
+        userRPE.child(uid).limitToLast(1).get()
             .addOnSuccessListener { snapshot ->
+                var distance = 0.0
+                var step = 0.0
+                var hr = 0.0
+
                 if (snapshot.exists()) {
                     for (child in snapshot.children) {
-                        val data = child.value as Map<*, *>
-                        val distance = (data["distance_km"] as? Double) ?: 0.0
-                        Log.e("RecapFragment","history skrng $distance")
-
-                        binding.RPEEasy.setOnClickListener {
-                            val target = distance + (distance * 0.015)
-                            GlobalData.distanceTargetNextSession = target
-
-                            Firebase.database.getReference("users").child(uid).child("today_challenge")
-                                .setValue(
-                                    mapOf(
-                                        "rpe" to "Easy",
-                                        "targetDistance" to target
-                                    )
-                                )
-                            gotoFinish()
-                        }
-
-                        binding.RPENormal.setOnClickListener {
-                            val target = distance
-                            GlobalData.distanceTargetNextSession = target
-                            Firebase.database.getReference("users").child(uid).child("today_challenge")
-                                .setValue(
-                                    mapOf(
-                                        "rpe" to "Normal",
-                                        "targetDistance" to target
-                                    )
-                                )
-                            gotoFinish()
-                        }
-
-                        binding.RPEHard.setOnClickListener {
-                            val target = distance - (distance * 0.005)
-                            GlobalData.distanceTargetNextSession = target
-                            Firebase.database.getReference("users").child(uid).child("today_challenge")
-                                .setValue(
-                                    mapOf(
-                                        "rpe" to "Tired",
-                                        "targetDistance" to target
-                                    )
-                                )
-                            gotoFinish()
-                        }
-
+                        val data = child.value as? Map<*, *>
+                        distance = (data?.get("distance_km") as? Double) ?: 0.0
+                        step = (data?.get("steps") as? Double) ?: 0.0
+                        hr = (data?.get("heart_rate") as? Double) ?: 0.0
                     }
-                } else {
-                    Log.d("FirebaseLatest", "Data kosong.")
+                }
+
+                Log.d("RecapFragment", "Latest data: $distance km | $step step | $hr bpm")
+
+                binding.RPEEasy.setOnClickListener {
+                    val target = distance + (distance * 0.015)
+                    saveChallenge(uid, "Easy", target)
+                }
+
+                binding.RPENormal.setOnClickListener {
+                    val target = distance
+                    saveChallenge(uid, "Normal", target)
+                }
+
+                binding.RPEHard.setOnClickListener {
+                    val target = distance - (distance * 0.005)
+                    saveChallenge(uid, "Tired", target)
                 }
             }
             .addOnFailureListener {
-                Log.e("FirebaseLatest", "Error: ${it.message}")
+                Log.e("RecapFragment", "Error ambil history: ${it.message}")
             }
     }
 
-    private fun gotoFinish(){
+    private fun saveChallenge(uid: String, rpe: String, target: Double) {
+        val db = Firebase.database
+        val userChallengesRef = db.getReference("users").child(uid).child("challenges")
+
+        val challengeData = mapOf(
+            "rpe" to rpe,
+            "targetDistance" to target,
+            "completedAt" to 0L,
+            "timestamp" to System.currentTimeMillis()
+        )
+
+        val newRef = userChallengesRef.push()
+        newRef.setValue(challengeData).addOnSuccessListener {
+            db.getReference("users").child(uid).child("today_challenge").setValue(challengeData)
+            trimOldChallenges(uid)
+            gotoFinish()
+        }
+    }
+
+    private fun trimOldChallenges(uid: String) {
+        val userChallengesRef = Firebase.database.getReference("users").child(uid).child("challenges")
+        userChallengesRef.orderByChild("timestamp")
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.childrenCount > 3) {
+                        val extra = snapshot.childrenCount - 3
+                        snapshot.children.take(extra.toInt()).forEach { it.ref.removeValue() }
+                        Log.d("RecapFragment", "🧹 Hapus $extra challenge lama.")
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {}
+            })
+    }
+
+    private fun gotoFinish() {
         val intent = Intent(requireContext(), RpeFinishingRequestActivity::class.java)
         startActivity(intent)
         requireActivity().finish()
