@@ -116,31 +116,20 @@ class CreatingPlanFragment : Fragment() {
         val auth = FirebaseAuth.getInstance()
         val uid = auth.currentUser?.uid ?: return
 
-
         userRef.child(uid).get().addOnSuccessListener { snapshot ->
             if (snapshot.exists()){
                 val userPreferencesfromFirebasehehe = snapshot.getValue(User::class.java)
                 if (userPreferencesfromFirebasehehe != null) {
 
-                    val ageBelumDipisah =
-                        userPreferencesfromFirebasehehe.birthYYYYmm // misal 200511
+                    val ageBelumDipisah = userPreferencesfromFirebasehehe.birthYYYYmm // misal 200511
                     val birthYear = ageBelumDipisah.substring(0, 4).toInt() // 2005
                     val birthMonth = ageBelumDipisah.substring(4, 6).toInt() // 11
+
                     val bulanuserlahir = YearMonth.of(birthYear, birthMonth)
                     val bulanSekarang = YearMonth.now()
-                    val kalkulasiBulanUserDariLahir =
-                        ChronoUnit.MONTHS.between(bulanuserlahir, bulanSekarang)
-                    Log.d(
-                        "CreatingPlan",
-                        "umur sekarang dengan satuan bulan $kalkulasiBulanUserDariLahir dengan bulan di hitung saat ini $bulanSekarang"
-                    )
-                    val bulanLahir = YearMonth.of(birthYear, birthMonth)
-                    val totalBulan = ChronoUnit.MONTHS.between(bulanLahir, bulanSekarang)
-
-                    val tahunSekarang = Year.now()
-                    val birthYear2 = Year.of(birthYear)
-                    val age = ChronoUnit.YEARS.between(birthYear2, tahunSekarang)
-                    Log.d("CreatingPlan", "umur sekarang dengan satuan tahun $age")
+                    val kalkulasiBulanUserDariLahir = ChronoUnit.MONTHS.between(bulanuserlahir, bulanSekarang)
+                    val age = kalkulasiBulanUserDariLahir / 12
+                    Log.d("CreatingPlan", "umur sekarang dengan satuan bulan $kalkulasiBulanUserDariLahir dan tahun $age")
 
                     fun bmi(): String {
                         Log.d("CreatingPlan", "Ini adalah bmi fungsi init")
@@ -149,131 +138,103 @@ class CreatingPlanFragment : Fragment() {
                         val sex = userPreferencesfromFirebasehehe.gender
 
                         if (age >= 19) {
-                            val kalkulasibmi = weight / (height * height)
-                            val kalkulasi = kalkulasibmi * 10000
-                            Log.d("CreatingPlan", "Hasil kalkulasi BMI :  $kalkulasibmi dan yang sudah di kali 10.000 $kalkulasi")
-                            val kategori = when (kalkulasi) {
+                            // BMI dewasa (>=19 tahun)
+                            val kalkulasibmi = weight / ((height / 100).pow(2))
+                            Log.d("CreatingPlan", "Hasil kalkulasi BMI : $kalkulasibmi")
+                            val kategori = when (kalkulasibmi) {
                                 in Double.NEGATIVE_INFINITY..18.4 -> "Underweight"
                                 in 18.5..24.9 -> "Normal"
                                 in 25.0..29.9 -> "Overweight"
                                 else -> "Obese"
                             }
-                            Log.d("CreatingPlan", "ini age 20 > dapet kategori $kategori")
+                            Log.d("CreatingPlan", "umur >= 19 dapet kategori $kategori")
                             return kategori
                         } else {
-                            val bmibocilblmFix = weight / (height * height)
-                            // ngambil el em es
-                            if (sex == "Male") {
-                                val L = 1
-                                val M = 2
-                                val S = 3
-//                                val dataForBoy = File("app/src/main/assets/bmi-boys-z-who-2007-exp.csv")
-//                                    .readLines()
-//                                    .find {
-//                                        it.split(',').first()
-//                                            .trim() == kalkulasiBulanUserDariLahir.toString()
-//                                    }
-//                                    ?.split(',')
-//                                    ?.slice(listOf(L, M, S))
-                                val inputStream = requireContext().assets.open("bmi-boys-z-who-2007-exp.csv")
-                                val lines = inputStream.bufferedReader().readLines()
+                            // BMI anak (<19 tahun) pakai LMS WHO
+                            val bmibocilblmFix = weight / ((height / 100).pow(2))
+                            val fileName = if (sex == "Male") "bmi-boys-z-who-2007-exp.csv" else "bmi-girls-z-who-2007-exp.csv"
+                            val inputStream = requireContext().assets.open(fileName)
+                            val lines = inputStream.bufferedReader().readLines()
 
-                                val dataForBoy = lines.find {
-                                    it.split(',').first().trim() == kalkulasiBulanUserDariLahir.toString()
-                                }?.split(',')?.slice(listOf(L, M, S))
+                            val dataForChild = lines.find {
+                                it.split(',').first().trim() == kalkulasiBulanUserDariLahir.toString()
+                            }?.split(',')
 
-                                // LMS Equation
-                                val z_score = ((bmibocilblmFix / M).pow(L) - 1) / (L * S)
-                                Log.d("CreatingPlan", "Hasil z score = $z_score")
-                                val kategoriBocil = when (z_score) {
-                                    in Double.NEGATIVE_INFINITY..-2.0 -> "Underweight"
-                                    in -2.0..1.0 -> "Normal"
-                                    in 1.0..2.0 -> "Overweight"
-                                    else -> "Obese"
-                                }
-                                Log.d("CreatingPlan", "ini age < 20 boy dapet kategori $kategoriBocil")
-                                return kategoriBocil
-                            } else { // ini pricess
-                                val L = 1
-                                val M = 2
-                                val S = 3
-//                                val dataForGirl = File("app/src/main/assets/bmi-girls-z-who-2007-exp.csv")
-//                                    .readLines()
-//                                    .find {
-//                                        it.split(',').first()
-//                                            .trim() == kalkulasiBulanUserDariLahir.toString()
-//                                    }
-//                                    ?.split(',')
-//                                    ?.slice(listOf(L, M, S))
-                                val inputStream = requireContext().assets.open("bmi-girls-z-who-2007-exp.csv")
-                                val lines = inputStream.bufferedReader().readLines()
-
-                                val dataForGirl = lines.find {
-                                    it.split(',').first().trim() == kalkulasiBulanUserDariLahir.toString()
-                                }?.split(',')?.slice(listOf(L, M, S))
-
-
-                                // LMS Equation
-                                val z_score = ((bmibocilblmFix / M).pow(L) - 1) / (L * S)
-                                Log.d("CreatingPlan", "Hasil z score = $z_score")
-                                val kategoriBocil = when (z_score) {
-                                    in Double.NEGATIVE_INFINITY..-2.0 -> "Underweight"
-                                    in -2.0..1.0 -> "Normal"
-                                    in 1.0..2.0 -> "Overweight"
-                                    else -> "Obese"
-                                }
-                                Log.d("CreatingPlan", "ini age < 20 girl dapet kategori $kategoriBocil")
-                                return kategoriBocil
+                            if (dataForChild == null) {
+                                Log.e("CreatingPlan", "Data WHO untuk bulan ke-$kalkulasiBulanUserDariLahir tidak ditemukan.")
+                                return "Unknown"
                             }
+
+                            val L = dataForChild[1].toDouble()
+                            val M = dataForChild[2].toDouble()
+                            val S = dataForChild[3].toDouble()
+
+                            val z_score = if (L == 0.0) {
+                                kotlin.math.ln(bmibocilblmFix / M) / S
+                            } else {
+                                ((bmibocilblmFix / M).pow(L) - 1) / (L * S)
+                            }
+
+                            Log.d("CreatingPlan", "Hasil z score = $z_score, dengan L = $L, M= $M, S= $S")
+
+                            val kategoriBocil = when (z_score) {
+                                in Double.NEGATIVE_INFINITY..-2.0 -> "Underweight"
+                                in -2.0..1.0 -> "Normal"
+                                in 1.0..2.0 -> "Overweight"
+                                else -> "Obese"
+                            }
+                            Log.d("CreatingPlan", "umur < 19 dapet kategori $kategoriBocil")
+                            return kategoriBocil
                         }
                     }
+
                     val hrMax = 200 - age
                     val bmi = bmi()
-                    Log.d("Creating Plan","BMI yg didapet $bmi")
+                    Log.d("CreatingPlan","BMI yg didapet $bmi")
 
                     // jadwal umur
                     val jadwal = when {
-                        age in 5 .. 19 -> "Minimal 3 jam seminggu"
-                        age in 20 .. 64 -> "Minimal 7.5 jam seminggu"
-                        age >= 65 -> "2.5 jam seminggu"
+                        age in 5..19 -> "Minimal 3 jam seminggu"
+                        age in 20..64 -> "Minimal 7.5 jam seminggu"
+                        age >= 65 -> "Minimal 2.5 jam seminggu"
                         else -> "Tidak ada rekomendasi, usia terlalu dini"
                     }
-                    // rekomendasi hari = senen, rabu, sabtu
 
                     // bmi
                     val olahragaUser = if (bmi == "Underweight" || bmi == "Obese"){
                         "Jalan santai"
-                    }else{
+                    } else {
                         "Jogging"
                     }
 
                     // HrMax
                     val HrTarget = if (bmi == "Normal") {
-                        (0.75 * hrMax)..(0.85 * hrMax)
-                    } else { // obese, underweight sama overweight
-                        (0.75 * hrMax)
+                        "${(0.75 * hrMax).toInt()} - ${(0.85 * hrMax).toInt()} bpm"
+                    } else {
+                        "< ${(0.75 * hrMax).toInt()} bpm"
                     }
 
                     val rulebaseUser = mapOf(
                         "jenisOlahragaUser" to olahragaUser,
-                        "HrTarget" to HrTarget.toString(),
+                        "HrTarget" to HrTarget,
                         "jadwal" to jadwal
                     )
+
                     userRef.child(uid).child("hasilRulebase").setValue(rulebaseUser)
                         .addOnSuccessListener {
                             Log.d("Creating plan","Rulebase udah masuk")
                             Log.d("Creating plan","jenis olahraga $olahragaUser")
                             Log.d("Creating plan","Hr target $HrTarget")
                             Log.d("Creating plan","jadwal $jadwal")
-                        } .addOnFailureListener {
+                        }
+                        .addOnFailureListener {
                             Log.d("Creating plan", "life bloom like flower..")
                         }
                 }
             }
-
         }
-
     }
+
 
 
     companion object {
