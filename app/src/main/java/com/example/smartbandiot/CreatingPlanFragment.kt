@@ -194,10 +194,10 @@ class CreatingPlanFragment : Fragment() {
 
                     // jadwal umur
                     val jadwal = when {
-                        age in 5..19 -> "Minimal 3 jam seminggu"
-                        age in 20..64 -> "Minimal 7.5 jam seminggu"
-                        age >= 65 -> "Minimal 2.5 jam seminggu"
-                        else -> "Tidak ada rekomendasi, usia terlalu dini"
+                        age in 5..19 -> "At least 3 hours/week"
+                        age in 20..64 -> "At least 7.5 hours/week"
+                        age >= 65 -> "At least 2.5 hours/week"
+                        else -> "No recommendation"
                     }
 
                     // bmi

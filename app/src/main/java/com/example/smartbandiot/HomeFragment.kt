@@ -19,7 +19,7 @@ class HomeFragment : Fragment() {
     private val user = FirebaseAuth.getInstance().currentUser
 
     private lateinit var db: FirebaseDatabase
-    private lateinit var liveHeartRateRef: DatabaseReference
+    private lateinit var jadwalLatihan: DatabaseReference
     private lateinit var challengesRef: DatabaseReference
 
     override fun onCreateView(
@@ -39,29 +39,48 @@ class HomeFragment : Fragment() {
         db = FirebaseDatabase.getInstance("https://smartbandforteens-default-rtdb.asia-southeast1.firebasedatabase.app/")
 
         challengesRef = db.getReference("users").child(uid).child("challenges")
-        liveHeartRateRef = db.getReference("data_iot").child("device_001").child("heart_rate")
+        jadwalLatihan = db.getReference("users_personal_preferences")
+            .child(uid)
+            .child("hasilRulebase")
+            .child("jadwal")
 
-        setupLiveHeartRateListener()
+        setupJadwalLatihanListener()
         loadAllChallenges()
     }
 
-    private fun setupLiveHeartRateListener() {
-        liveHeartRateRef.addValueEventListener(object : ValueEventListener {
+//    private fun setupLiveHeartRateListener() {
+//        liveHeartRateRef.addValueEventListener(object : ValueEventListener {
+//            override fun onDataChange(snapshot: DataSnapshot) {
+//                if (!isAdded || _binding == null) return
+//                val bpm = snapshot.getValue(Int::class.java) ?: -1
+//
+//                if (bpm > 0) {
+//                    binding.txtLiveHeartRateHome.text = "$bpm bpm"
+//                    binding.txtLiveHeartRateHome.setTextColor(requireContext().getColor(R.color.no_device_red))
+//                } else {
+//                    binding.txtLiveHeartRateHome.text = "-- bpm"
+//                    binding.txtLiveHeartRateHome.setTextColor(requireContext().getColor(R.color.abu_abu))
+//                }
+//            }
+//
+//            override fun onCancelled(error: DatabaseError) {
+//                Log.e("HomeFragment", "Error HR: ${error.message}")
+//            }
+//        })
+//    }
+
+    private fun setupJadwalLatihanListener() {
+        jadwalLatihan.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (!isAdded || _binding == null) return
-                val bpm = snapshot.getValue(Int::class.java) ?: -1
+                val jadwal = snapshot.getValue(String::class.java) ?: "Belum ada jadwal"
 
-                if (bpm > 0) {
-                    binding.txtLiveHeartRateHome.text = "$bpm bpm"
-                    binding.txtLiveHeartRateHome.setTextColor(requireContext().getColor(R.color.no_device_red))
-                } else {
-                    binding.txtLiveHeartRateHome.text = "-- bpm"
-                    binding.txtLiveHeartRateHome.setTextColor(requireContext().getColor(R.color.abu_abu))
-                }
+                // tampilkan jadwal ke TextView yang sebelumnya menampilkan heart rate
+                binding.txtLiveHeartRateHome.text = jadwal
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.e("HomeFragment", "Error HR: ${error.message}")
+                Log.e("HomeFragment", "Error ambil jadwal latihan: ${error.message}")
             }
         })
     }
