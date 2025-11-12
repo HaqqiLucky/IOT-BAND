@@ -46,7 +46,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Live Heart Rate"
+                android:text="Weekly Training Schedule "
                 android:layout_marginTop="12dp"
                 android:layout_marginLeft="20dp"
                 android:fontFamily="@font/inter_regular"
@@ -56,12 +56,12 @@
                 android:id="@+id/txtLiveHeartRateHome"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="28sp"
-                android:layout_marginTop="30dp"
+                android:textSize="20sp"
+                android:layout_marginTop="40dp"
                 android:layout_marginLeft="20dp"
                 android:fontFamily="@font/poppins_semibold"
                 android:textColor="@color/no_device_red"
-                android:text="-- bpm"/>
+                android:text="aku seneng"/>
 
         </androidx.cardview.widget.CardView>
 
