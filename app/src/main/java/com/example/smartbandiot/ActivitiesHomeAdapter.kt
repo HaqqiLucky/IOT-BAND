@@ -2,14 +2,12 @@ package com.example.smartbandiot
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.smartbandiot.databinding.ItemChallengeBinding
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
 
 class ActivitiesHomeAdapter(
-    private val dataList: List<ChallengeItemData>,
-    private val onChallengeFinished: (() -> Unit)? = null
+    private val dataList: List<ChallengeItemData>
 ) : RecyclerView.Adapter<ActivitiesHomeAdapter.BindingViewHolder>() {
 
     inner class BindingViewHolder(val binding: ItemChallengeBinding) :
@@ -18,26 +16,15 @@ class ActivitiesHomeAdapter(
         fun bind(item: ChallengeItemData) {
             binding.date.text = item.formattedDate
             binding.title.text = item.title
-            binding.time.text = item.formattedTime
-            binding.pace.text = item.formattedPace
-            binding.totalDistance.text = "${item.distanceKm} KM"
+            binding.step.text = item.step.toInt().toString()
+            binding.heartrate.text = "${item.heartRate.toInt()} bpm"
+            binding.nextDistance.text = "${String.format("%.2f", item.distanceKm)} KM"
 
-            // ketika user klik challenge → user mau menjalankan challenge
-            binding.root.setOnClickListener {
-                // masuk ke jogging fragment
-                val fragment = JoggingFragment()
-                val activity = binding.root.context as MainActivity
-                activity.supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, fragment)
-                    .addToBackStack(null)
-                    .commit()
-
-                // saat challenge considered DONE (masuk running)
-                val uid = FirebaseAuth.getInstance().currentUser!!.uid
-                FirebaseDatabase.getInstance("https://smartbandforteens-default-rtdb.asia-southeast1.firebasedatabase.app/")
-                    .getReference("users").child(uid).child("today_challenge").removeValue()
-
-                onChallengeFinished?.invoke()
+            // ubah warna kalau challenge completed
+            if (item.title.contains("Completed", ignoreCase = true)) {
+                val green = ContextCompat.getColor(binding.root.context, R.color.green_app_theme)
+                binding.title.setTextColor(green)
+                binding.nextDistance.setTextColor(green)
             }
         }
     }
