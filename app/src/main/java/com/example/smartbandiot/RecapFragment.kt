@@ -31,6 +31,7 @@ class RecapFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
+        // 🔹 Ambil data history terbaru
         userRPE.child(uid).limitToLast(1).get()
             .addOnSuccessListener { snapshot ->
                 var distance = 0.0
@@ -40,27 +41,27 @@ class RecapFragment : Fragment() {
                 if (snapshot.exists()) {
                     for (child in snapshot.children) {
                         val data = child.value as? Map<*, *>
-                        distance = (data?.get("distance_km") as? Double) ?: 0.0
-                        step = (data?.get("steps") as? Double) ?: 0.0
-                        hr = (data?.get("heart_rate") as? Double) ?: 0.0
+                        distance = (data?.get("distance_km") as? Number)?.toDouble() ?: 0.0
+                        step = (data?.get("steps") as? Number)?.toDouble() ?: 0.0
+                        hr = (data?.get("heart_rate") as? Number)?.toDouble() ?: 0.0
                     }
                 }
 
                 Log.d("RecapFragment", "Latest data: $distance km | $step step | $hr bpm")
 
                 binding.RPEEasy.setOnClickListener {
-                    val target = distance + (distance * 0.015)
-                    saveChallenge(uid, "Easy", target)
+                    val target = if (distance > 0) distance + (distance * 0.015) else 0.1
+                    saveChallenge(uid, "Easy", target, hr, step, distance)
                 }
 
                 binding.RPENormal.setOnClickListener {
-                    val target = distance
-                    saveChallenge(uid, "Normal", target)
+                    val target = if (distance > 0) distance else 0.1
+                    saveChallenge(uid, "Normal", target, hr, step, distance)
                 }
 
                 binding.RPEHard.setOnClickListener {
-                    val target = distance - (distance * 0.005)
-                    saveChallenge(uid, "Tired", target)
+                    val target = if (distance > 0) distance - (distance * 0.005) else 0.1
+                    saveChallenge(uid, "Tired", target, hr, step, distance)
                 }
             }
             .addOnFailureListener {
@@ -68,7 +69,8 @@ class RecapFragment : Fragment() {
             }
     }
 
-    private fun saveChallenge(uid: String, rpe: String, target: Double) {
+    /** 🔹 Simpan challenge baru lengkap dengan HR & Step dari history terakhir */
+    private fun saveChallenge(uid: String, rpe: String, target: Double, hr: Double, step: Double, distance: Double) {
         val db = Firebase.database
         val userChallengesRef = db.getReference("users").child(uid).child("challenges")
 
@@ -76,7 +78,10 @@ class RecapFragment : Fragment() {
             "rpe" to rpe,
             "targetDistance" to target,
             "completedAt" to 0L,
-            "timestamp" to System.currentTimeMillis()
+            "timestamp" to System.currentTimeMillis(),
+            "lastHeartRate" to hr,
+            "lastStep" to step,
+            "lastDistance" to distance
         )
 
         val newRef = userChallengesRef.push()
@@ -87,6 +92,7 @@ class RecapFragment : Fragment() {
         }
     }
 
+    /** 🔹 Batasi maksimal 3 challenge */
     private fun trimOldChallenges(uid: String) {
         val userChallengesRef = Firebase.database.getReference("users").child(uid).child("challenges")
         userChallengesRef.orderByChild("timestamp")

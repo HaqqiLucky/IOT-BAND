@@ -20,7 +20,6 @@ class HomeFragment : Fragment() {
 
     private lateinit var db: FirebaseDatabase
     private lateinit var liveHeartRateRef: DatabaseReference
-    private lateinit var historyRef: DatabaseReference
     private lateinit var challengesRef: DatabaseReference
 
     override fun onCreateView(
@@ -39,15 +38,13 @@ class HomeFragment : Fragment() {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         db = FirebaseDatabase.getInstance("https://smartbandforteens-default-rtdb.asia-southeast1.firebasedatabase.app/")
 
-        historyRef = db.getReference("history").child(uid)
         challengesRef = db.getReference("users").child(uid).child("challenges")
         liveHeartRateRef = db.getReference("data_iot").child("device_001").child("heart_rate")
 
         setupLiveHeartRateListener()
-        loadAllChallenges(uid)
+        loadAllChallenges()
     }
 
-    /** 🔴 Real-time Live Heart Rate dari IoT */
     private fun setupLiveHeartRateListener() {
         liveHeartRateRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -56,115 +53,70 @@ class HomeFragment : Fragment() {
 
                 if (bpm > 0) {
                     binding.txtLiveHeartRateHome.text = "$bpm bpm"
-                    binding.txtLiveHeartRateHome.setTextColor(
-                        requireContext().getColor(R.color.no_device_red)
-                    )
+                    binding.txtLiveHeartRateHome.setTextColor(requireContext().getColor(R.color.no_device_red))
                 } else {
                     binding.txtLiveHeartRateHome.text = "-- bpm"
-                    binding.txtLiveHeartRateHome.setTextColor(
-                        requireContext().getColor(R.color.abu_abu)
-                    )
+                    binding.txtLiveHeartRateHome.setTextColor(requireContext().getColor(R.color.abu_abu))
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.e("HomeFragment", "Error read live HR: ${error.message}")
+                Log.e("HomeFragment", "Error HR: ${error.message}")
             }
         })
     }
 
-    /** 🔹 Ambil & tampilkan challenge list, update status completed jika history terakhir melebihi target */
-    private fun loadAllChallenges(uid: String) {
+    private fun loadAllChallenges() {
         challengesRef.orderByChild("timestamp")
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (!isAdded || _binding == null) return
                     val challengeList = mutableListOf<ChallengeItemData>()
 
-                    // 🔹 Ambil semua history (bukan cuma terakhir)
-                    historyRef.orderByChild("timestamp").limitToLast(10)
-                        .addListenerForSingleValueEvent(object : ValueEventListener {
-                            override fun onDataChange(historySnap: DataSnapshot) {
-                                val historyData = mutableListOf<Pair<Long, Map<String, Any>>>()
-                                for (child in historySnap.children) {
-                                    val map = child.value as? Map<String, Any> ?: continue
-                                    val ts = map["timestamp"] as? Long ?: 0L
-                                    historyData.add(Pair(ts, map))
-                                }
+                    for (child in snapshot.children) {
+                        val rpe = child.child("rpe").getValue(String::class.java) ?: "Normal"
+                        val target = child.child("targetDistance").getValue(Double::class.java) ?: 0.0
+                        val completedAt = child.child("completedAt").getValue(Long::class.java) ?: 0L
 
-                                // urutkan history dari paling lama ke terbaru
-                                historyData.sortBy { it.first }
+                        val hr = child.child("lastHeartRate").getValue(Double::class.java) ?: 0.0
+                        val step = child.child("lastStep").getValue(Double::class.java) ?: 0.0
+                        val distance = child.child("lastDistance").getValue(Double::class.java) ?: 0.0
 
-                                for (child in snapshot.children) {
-                                    val challengeKey = child.key ?: continue
-                                    val rpe = child.child("rpe").getValue(String::class.java) ?: "Normal"
-                                    val targetDistance = child.child("targetDistance").getValue(Double::class.java) ?: 0.0
-                                    val completedAt = child.child("completedAt").getValue(Long::class.java) ?: 0L
-                                    val timestamp = child.child("timestamp").getValue(Long::class.java) ?: 0L
+                        var title = when (rpe) {
+                            "Easy" -> "Recovery Run"
+                            "Normal" -> "Light Jog"
+                            else -> "Tempo Challenge"
+                        }
 
-                                    // 🔹 cari history setelah challenge dibuat
-                                    val matchedHistory = historyData.lastOrNull { it.first > timestamp }
-                                    val lastKnownHistory = historyData.lastOrNull()?.second ?: emptyMap()
+                        if (completedAt > 0L) title = "✅ Challenge Completed"
 
-                                    // ambil data HR & step sesuai history yg ditemukan
-                                    val heart = (matchedHistory?.second?.get("heart_rate") as? Number)?.toDouble()
-                                        ?: (lastKnownHistory["heart_rate"] as? Number)?.toDouble() ?: 0.0
-                                    val step = (matchedHistory?.second?.get("steps") as? Number)?.toDouble()
-                                        ?: (lastKnownHistory["steps"] as? Number)?.toDouble() ?: 0.0
-                                    val distance = (matchedHistory?.second?.get("distance_km") as? Number)?.toDouble()
-                                        ?: (lastKnownHistory["distance_km"] as? Number)?.toDouble() ?: 0.0
+                        val challenge = ChallengeItemData(
+                            title = title,
+                            timeInSec = when (rpe) {
+                                "Easy" -> 1800
+                                "Normal" -> 2500
+                                else -> 3000
+                            },
+                            distanceKm = target,
+                            step = step,
+                            heartRate = hr
+                        )
 
-                                    var statusTitle = when (rpe) {
-                                        "Easy" -> "Recovery Run"
-                                        "Normal" -> "Light Jog"
-                                        else -> "Tempo Challenge"
-                                    }
+                        challengeList.add(challenge)
+                    }
 
-                                    var finalCompletedAt = completedAt
+                    // hapus challenge lama > 3
+                    if (snapshot.childrenCount > 3) {
+                        val extra = snapshot.childrenCount - 3
+                        snapshot.children.take(extra.toInt()).forEach { it.ref.removeValue() }
+                        Log.d("HomeFragment", "🧹 Hapus $extra challenge lama.")
+                    }
 
-                                    // 🔹 jika history sudah melewati target & belum ditandai complete → update firebase
-                                    if (distance >= targetDistance && completedAt == 0L) {
-                                        finalCompletedAt = System.currentTimeMillis()
-                                        challengesRef.child(challengeKey).child("completedAt").setValue(finalCompletedAt)
-                                        statusTitle = "✅ Challenge Completed"
-                                        Log.d("HomeFragment", "Challenge $challengeKey completed! Distance=$distance / Target=$targetDistance")
-                                    } else if (completedAt > 0L) {
-                                        statusTitle = "✅ Challenge Completed"
-                                    }
-
-                                    val challenge = ChallengeItemData(
-                                        title = statusTitle,
-                                        timeInSec = when (rpe) {
-                                            "Easy" -> 1800
-                                            "Normal" -> 2500
-                                            else -> 3000
-                                        },
-                                        distanceKm = targetDistance,
-                                        step = step,
-                                        heartRate = heart
-                                    )
-
-                                    challengeList.add(challenge)
-                                }
-
-                                // 🔹 hapus challenge lama > 3
-                                if (snapshot.childrenCount > 3) {
-                                    val extra = snapshot.childrenCount - 3
-                                    snapshot.children.take(extra.toInt()).forEach { it.ref.removeValue() }
-                                    Log.d("HomeFragment", "🧹 Hapus $extra challenge lama.")
-                                }
-
-                                challengeList.reverse()
-                                binding.resaikelviewHome.apply {
-                                    layoutManager = LinearLayoutManager(requireContext())
-                                    adapter = ActivitiesHomeAdapter(challengeList)
-                                }
-                            }
-
-                            override fun onCancelled(error: DatabaseError) {
-                                Log.e("HomeFragment", "Error ambil history: ${error.message}")
-                            }
-                        })
+                    challengeList.reverse()
+                    binding.resaikelviewHome.apply {
+                        layoutManager = LinearLayoutManager(requireContext())
+                        adapter = ActivitiesHomeAdapter(challengeList)
+                    }
                 }
 
                 override fun onCancelled(error: DatabaseError) {

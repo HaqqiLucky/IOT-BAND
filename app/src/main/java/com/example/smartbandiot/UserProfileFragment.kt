@@ -26,7 +26,8 @@ class UserProfileFragment : Fragment() {
     private lateinit var tvAge: TextView
 
     private val currentUser = FirebaseAuth.getInstance().currentUser
-    private lateinit var databaseRef: DatabaseReference
+    private lateinit var userRef: DatabaseReference
+    private lateinit var preferencesRef: DatabaseReference
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,11 +49,12 @@ class UserProfileFragment : Fragment() {
         }
 
         if (currentUser != null) {
-            databaseRef = FirebaseDatabase.getInstance()
-                .getReference("users")
-                .child(currentUser.uid)
+            val db = FirebaseDatabase.getInstance("https://smartbandforteens-default-rtdb.asia-southeast1.firebasedatabase.app/")
+            userRef = db.getReference("users").child(currentUser.uid)
+            preferencesRef = db.getReference("users_personal_preferences").child(currentUser.uid)
 
             loadFirebaseData()
+            loadUserPreferencesData() // ✅ ambil tinggi & berat dari user_personal_preferences
         }
 
         loadSharedPreferencesData()
@@ -64,19 +66,20 @@ class UserProfileFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         showBottomNavBar()
-        if (currentUser != null && ::databaseRef.isInitialized) {
+        if (currentUser != null && ::userRef.isInitialized) {
             loadSharedPreferencesData()
             loadFirebaseData()
+            loadUserPreferencesData()
         }
     }
 
+    /** 🔹 Ambil dari node "users" untuk data dasar */
     private fun loadFirebaseData() {
-        if (!::databaseRef.isInitialized) return
+        if (!::userRef.isInitialized) return
 
-        databaseRef.addListenerForSingleValueEvent(object : ValueEventListener {
+        userRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
-
                     val firebaseWeight = snapshot.child("weight").getValue(String::class.java)
                     val firebaseHeight = snapshot.child("height").getValue(String::class.java)
                     val firebaseAge = snapshot.child("age").getValue(String::class.java)
@@ -93,6 +96,32 @@ class UserProfileFragment : Fragment() {
         })
     }
 
+    /** 🔹 Ambil tinggi & berat dari node "users_personal_preferences" */
+    private fun loadUserPreferencesData() {
+        if (!::preferencesRef.isInitialized) return
+
+        preferencesRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    val berat = snapshot.child("berat").getValue(String::class.java)
+                    val tinggi = snapshot.child("tinggi").getValue(String::class.java)
+                    val umur = snapshot.child("umur").getValue(String::class.java)
+
+                    if (!berat.isNullOrBlank()) tvWeight.text = "$berat kg"
+                    if (!tinggi.isNullOrBlank()) tvHeight.text = "$tinggi cm"
+                    if (!umur.isNullOrBlank()) tvAge.text = umur
+                } else {
+                    Log.w("UserProfile", "⚠️ Data preferences tidak ditemukan di Firebase.")
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("UserProfile", "Gagal ambil preferences: ${error.message}")
+            }
+        })
+    }
+
+    /** 🔹 Realtime heart rate listener */
     private fun listenRealtimeHeartRate() {
         val hrRef = FirebaseDatabase.getInstance("https://smartbandforteens-default-rtdb.asia-southeast1.firebasedatabase.app/")
             .getReference("data_iot").child("device_001").child("heart_rate")
@@ -109,6 +138,7 @@ class UserProfileFragment : Fragment() {
         })
     }
 
+    /** 🔹 Ambil cache dari SharedPreferences jika offline */
     private fun loadSharedPreferencesData() {
         val pref = requireContext().getSharedPreferences("user_profile", Context.MODE_PRIVATE)
 
@@ -123,7 +153,6 @@ class UserProfileFragment : Fragment() {
                     .error(R.drawable.welcome)
                     .into(imgProfile)
             } else imgProfile.setImageResource(R.drawable.welcome)
-
         } else {
             tvUserName.text = pref.getString("full_name", "Tamu")
             tvUserEmail.text = pref.getString("email", "Silakan Login")
