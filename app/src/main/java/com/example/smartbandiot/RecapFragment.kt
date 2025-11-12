@@ -12,33 +12,12 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.database
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [RecapFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class RecapFragment : Fragment() {
 
     private var _binding: FragmentRecapBinding? = null
     private val binding get() = _binding!!
     private val realtimeDatabase = Firebase.database
     private val userRPE = realtimeDatabase.getReference("history")
-
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,10 +30,6 @@ class RecapFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        binding.RPEEasy.setOnClickListener {
-//
-//        }
-
         val auth = FirebaseAuth.getInstance()
         val uid = auth.currentUser?.uid ?: return
 
@@ -65,31 +40,47 @@ class RecapFragment : Fragment() {
                         val data = child.value as Map<*, *>
                         val distance = (data["distance_km"] as? Double) ?: 0.0
                         Log.e("RecapFragment","history skrng $distance")
+
                         binding.RPEEasy.setOnClickListener {
-                            GlobalData.distanceTargetNextSession = distance + (distance * 0.015)
-                            Log.i("RecapFragment","easy next sesion adalah ${GlobalData.distanceTargetNextSession}")
-                            parentFragmentManager.beginTransaction()
-                                val intent = Intent(requireContext(), RpeFinishingRequestActivity::class.java)
-                                startActivity(intent)
-                                requireActivity().finish()
+                            val target = distance + (distance * 0.015)
+                            GlobalData.distanceTargetNextSession = target
+
+                            Firebase.database.getReference("users").child(uid).child("today_challenge")
+                                .setValue(
+                                    mapOf(
+                                        "rpe" to "Easy",
+                                        "targetDistance" to target
+                                    )
+                                )
+                            gotoFinish()
                         }
+
                         binding.RPENormal.setOnClickListener {
-                            GlobalData.distanceTargetNextSession = distance
-                            Log.i("RecapFragment","normal next sesion adalah ${GlobalData.distanceTargetNextSession}")
-                            parentFragmentManager.beginTransaction()
-                                val intent = Intent(requireContext(), RpeFinishingRequestActivity::class.java)
-                                startActivity(intent)
-                                requireActivity().finish()
+                            val target = distance
+                            GlobalData.distanceTargetNextSession = target
+                            Firebase.database.getReference("users").child(uid).child("today_challenge")
+                                .setValue(
+                                    mapOf(
+                                        "rpe" to "Normal",
+                                        "targetDistance" to target
+                                    )
+                                )
+                            gotoFinish()
                         }
+
                         binding.RPEHard.setOnClickListener {
-                            GlobalData.distanceTargetNextSession = distance - (distance * 0.005)
-                            Log.i("RecapFragment","hard next sesion adalah ${GlobalData.distanceTargetNextSession}")
-                            parentFragmentManager.beginTransaction()
-                                val intent = Intent(requireContext(), RpeFinishingRequestActivity::class.java)
-                                startActivity(intent)
-                            requireActivity().finish()
+                            val target = distance - (distance * 0.005)
+                            GlobalData.distanceTargetNextSession = target
+                            Firebase.database.getReference("users").child(uid).child("today_challenge")
+                                .setValue(
+                                    mapOf(
+                                        "rpe" to "Tired",
+                                        "targetDistance" to target
+                                    )
+                                )
+                            gotoFinish()
                         }
-                        Log.d("FirebaseLatest", "Dist: $distance")
+
                     }
                 } else {
                     Log.d("FirebaseLatest", "Data kosong.")
@@ -100,23 +91,9 @@ class RecapFragment : Fragment() {
             }
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment RecapFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            RecapFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    private fun gotoFinish(){
+        val intent = Intent(requireContext(), RpeFinishingRequestActivity::class.java)
+        startActivity(intent)
+        requireActivity().finish()
     }
 }

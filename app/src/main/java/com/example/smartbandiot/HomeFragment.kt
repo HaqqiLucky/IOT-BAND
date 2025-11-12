@@ -1,6 +1,7 @@
 package com.example.smartbandiot
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -8,131 +9,168 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.smartbandiot.databinding.FragmentHomeBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 import java.time.LocalTime
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 
-
-private val user = FirebaseAuth.getInstance().currentUser
-
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [HomeFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
+    private val user = FirebaseAuth.getInstance().currentUser
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    private lateinit var db: FirebaseDatabase
+    private lateinit var todayRef: DatabaseReference
+    private lateinit var historyRef: DatabaseReference
+    private var liveHRListener: ValueEventListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
+    ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
-
-
-        // ini buat ngambil data nama
-        if (user != null) {
-            binding.namaUser.text = user.displayName
-        }
-
-
-
+        if (user != null) binding.namaUser.text = user.displayName
         return binding.root
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val uid = FirebaseAuth.getInstance().currentUser!!.uid
-        val userRef = com.google.firebase.database.FirebaseDatabase
-            .getInstance("https://smartbandforteens-default-rtdb.asia-southeast1.firebasedatabase.app/")
-            .getReference("users").child(uid).child("today_challenge")
-
-        userRef.addValueEventListener(object : ValueEventListener{
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if(snapshot.exists()){
-                    val rpe = snapshot.child("rpe").getValue(String::class.java) ?: ""
-
-                    val challengeList = ArrayList<ChallengeItemData>()
-
-                    val challenge = when(rpe){
-                        "Very Tired" -> ChallengeItemData("Recovery Run", 1800, 2.0)
-                        "Tired" -> ChallengeItemData("Light Jog", 2500, 4.0)
-                        else -> ChallengeItemData("Tempo Challenge", 3000, 6.0)
-                    }
-
-                    challengeList.add(challenge)
-
-                    val adapter = ActivitiesHomeAdapter(challengeList)
-                    binding.resaikelviewHome.apply {
-                        layoutManager = LinearLayoutManager(requireContext())
-                        this.adapter = adapter
-                    }
-                } else {
-                    binding.resaikelviewHome.adapter = ActivitiesHomeAdapter(ArrayList())
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {}
-        })
-
-
         bonjourHuman()
+
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        db = FirebaseDatabase.getInstance("https://smartbandforteens-default-rtdb.asia-southeast1.firebasedatabase.app/")
+        todayRef = db.getReference("users").child(uid).child("today_challenge")
+        historyRef = db.getReference("history").child(uid)
+
+        setupLiveHeartRate(uid)
+        loadChallengeAndHistory(uid)
     }
 
+    /**
+     * 🔴 LIVE UPDATE HEART RATE dari Firebase
+     */
+    private fun setupLiveHeartRate(uid: String) {
+        liveHRListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var latestHR = 0.0
+                for (child in snapshot.children) {
+                    latestHR = (child.child("heart_rate").getValue(Double::class.java)) ?: 0.0
+                }
+                binding.txtLiveHeartRateHome.text = "${latestHR.toInt()} bpm"
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("HomeFragment", "Error ambil heart rate live: ${error.message}")
+            }
+        }
+
+        // dengarkan setiap perubahan heart_rate user ini (real-time)
+        historyRef.orderByKey().limitToLast(1)
+            .addValueEventListener(liveHRListener as ValueEventListener)
+    }
+
+    /**
+     * 🔵 Ambil data challenge hari ini dan progress terakhir
+     */
+    private fun loadChallengeAndHistory(uid: String) {
+        todayRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(todaySnap: DataSnapshot) {
+                if (!isAdded || _binding == null) return
+
+                val rpe = todaySnap.child("rpe").getValue(String::class.java) ?: "Normal"
+                val targetDistance = todaySnap.child("targetDistance").getValue(Double::class.java) ?: 0.0
+                val completedAt = todaySnap.child("completedAt").getValue(Long::class.java) ?: 0L
+
+                historyRef.orderByKey().limitToLast(1)
+                    .addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(historySnap: DataSnapshot) {
+                            var latestStep = 0.0
+                            var latestHR = 0.0
+                            var latestDist = 0.0
+
+                            for (child in historySnap.children) {
+                                latestStep = (child.child("steps").getValue(Double::class.java)) ?: 0.0
+                                latestHR = (child.child("heart_rate").getValue(Double::class.java)) ?: 0.0
+                                latestDist = (child.child("distance_km").getValue(Double::class.java)) ?: 0.0
+                            }
+
+                            Log.d(
+                                "HomeFragment",
+                                "Fetched → HR=$latestHR | Step=$latestStep | Dist=$latestDist | Target=$targetDistance"
+                            )
+
+                            if (targetDistance > 0 && latestDist >= targetDistance) {
+                                if (completedAt == 0L)
+                                    todayRef.child("completedAt").setValue(System.currentTimeMillis())
+                                showCompletedChallengeUI(targetDistance, latestStep, latestHR)
+                            } else {
+                                updateChallengeUI(rpe, targetDistance, latestStep, latestHR)
+                            }
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                            Log.e("HomeFragment", "Error ambil history: ${error.message}")
+                        }
+                    })
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("HomeFragment", "Error ambil today_challenge: ${error.message}")
+            }
+        })
+    }
+
+    private fun updateChallengeUI(rpe: String, distance: Double, step: Double, hr: Double) {
+        val challenge = ChallengeItemData(
+            title = when (rpe) {
+                "Easy" -> "Recovery Run"
+                "Normal" -> "Light Jog"
+                else -> "Tempo Challenge"
+            },
+            timeInSec = when (rpe) {
+                "Easy" -> 1800
+                "Normal" -> 2500
+                else -> 3000
+            },
+            distanceKm = distance,
+            step = step,
+            heartRate = hr
+        )
+
+        binding.resaikelviewHome.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = ActivitiesHomeAdapter(listOf(challenge))
+        }
+    }
+
+    private fun showCompletedChallengeUI(distance: Double, step: Double, hr: Double) {
+        val challengeCompleted = ChallengeItemData(
+            title = "✅ Challenge Completed",
+            timeInSec = 0,
+            distanceKm = distance,
+            step = step,
+            heartRate = hr
+        )
+
+        binding.resaikelviewHome.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = ActivitiesHomeAdapter(listOf(challengeCompleted))
+        }
+    }
+
+    private fun bonjourHuman() {
+        val hour = LocalTime.now().hour
+        binding.greeting.text = when (hour) {
+            in 4..10 -> "Good Morning 🔥"
+            in 11..15 -> "Good Afternoon 🔥"
+            else -> "Good Evening 🔥"
+        }
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        // hapus listener biar gak leak
+        liveHRListener?.let {
+            historyRef.removeEventListener(it)
+        }
         _binding = null
     }
-
-    private fun bonjourHuman(){
-        val currentTime : LocalTime = LocalTime.now()
-        val hour : Int = currentTime.hour
-
-        val greetings :  String = when (hour){
-            in 4..10 -> "Good Morning \uD83D\uDD25"
-            in 11..15 -> "Good Afternoon \uD83D\uDD25"
-            else -> "Good Evening \uD83D\uDD25"
-        }
-
-        binding.greeting.text = greetings
-    }
-
-
-
-        companion object {
-            /**
-             * Use this factory method to create a new instance of
-             * this fragment using the provided parameters.
-             *
-             * @param param1 Parameter 1.
-             * @param param2 Parameter 2.
-             * @return A new instance of fragment HomeFragment.
-             */
-            // TODO: Rename and change types and number of parameters
-            @JvmStatic
-            fun newInstance(param1: String, param2: String) =
-                HomeFragment().apply {
-                    arguments = Bundle().apply {
-                        putString(ARG_PARAM1, param1)
-                        putString(ARG_PARAM2, param2)
-                    }
-                }
-        }
-
 }
-

@@ -17,7 +17,8 @@
     <color name="green_item_at_home">#E7FFF8</color>
     <color name="red_time">#FF6363</color>
     <color name="abu_abu">#999999</color>
-
+    <color name="green_completed">#1BC47D</color>
+    <color name="green_dark">#0B8E5D</color>
 
 
 </resources>

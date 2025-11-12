@@ -8,17 +8,19 @@ import kotlin.math.roundToInt
 data class ChallengeItemData(
     val title: String,
     val timeInSec: Int,
-    val distanceKm: Double = GlobalData.distanceTargetNextSession,
+    val distanceKm: Double = 0.0,
+    val step: Double = 0.0,
+    val heartRate: Double = 0.0,
     val date: Long = System.currentTimeMillis()
 ) {
     val pace: Double
-        get() = (timeInSec / 60.0) / distanceKm
+        get() = if (distanceKm > 0) (timeInSec / 60.0) / distanceKm else 0.0
 
     val formattedPace: String
         get() {
             val minutes = pace.toInt()
             val seconds = ((pace - minutes) * 60).roundToInt()
-            return String.format("%d'%02d''", minutes, seconds)
+            return if (pace > 0) String.format("%d'%02d''", minutes, seconds) else "--"
         }
 
     val formattedTime: String
