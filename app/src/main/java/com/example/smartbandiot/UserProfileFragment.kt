@@ -20,14 +20,13 @@ class UserProfileFragment : Fragment() {
     private lateinit var imgProfile: ShapeableImageView
     private lateinit var tvUserName: TextView
     private lateinit var tvUserEmail: TextView
-
     private lateinit var tvWeight: TextView
     private lateinit var tvHeight: TextView
     private lateinit var tvAge: TextView
 
     private val currentUser = FirebaseAuth.getInstance().currentUser
     private lateinit var userRef: DatabaseReference
-    private lateinit var preferencesRef: DatabaseReference
+    private lateinit var personalPrefRef: DatabaseReference
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,17 +43,13 @@ class UserProfileFragment : Fragment() {
         tvHeight = view.findViewById(R.id.tvHeight)
         tvAge = view.findViewById(R.id.tvAge)
 
-        btnSettings.setOnClickListener {
-            navigateToSettings()
-        }
+        btnSettings.setOnClickListener { navigateToSettings() }
 
         if (currentUser != null) {
             val db = FirebaseDatabase.getInstance("https://smartbandforteens-default-rtdb.asia-southeast1.firebasedatabase.app/")
             userRef = db.getReference("users").child(currentUser.uid)
-            preferencesRef = db.getReference("users_personal_preferences").child(currentUser.uid)
-
+            personalPrefRef = db.getReference("users_personal_preferences").child(currentUser.uid)
             loadFirebaseData()
-            loadUserPreferencesData() // ✅ ambil tinggi & berat dari user_personal_preferences
         }
 
         loadSharedPreferencesData()
@@ -66,15 +61,72 @@ class UserProfileFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         showBottomNavBar()
-        if (currentUser != null && ::userRef.isInitialized) {
+        if (currentUser != null && ::userRef.isInitialized && ::personalPrefRef.isInitialized) {
             loadSharedPreferencesData()
             loadFirebaseData()
-            loadUserPreferencesData()
         }
     }
 
-    /** 🔹 Ambil dari node "users" untuk data dasar */
+    /** 🔹 Ambil data dari users_personal_preferences & fallback ke users jika kosong */
     private fun loadFirebaseData() {
+        if (!::personalPrefRef.isInitialized) return
+
+        // ambil dari users_personal_preferences
+        personalPrefRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    val firebaseWeight = snapshot.child("weight").getValue(Int::class.java)
+                    val firebaseHeight = snapshot.child("height").getValue(Int::class.java)
+                    val firebaseName = snapshot.child("name").getValue(String::class.java)
+                    val firebaseEmail = snapshot.child("email").getValue(String::class.java)
+                    val profileImage = snapshot.child("profileImagePath").getValue(String::class.java)
+                    val birthData = snapshot.child("birthYYYYmm").getValue(String::class.java)
+
+                    // Set nilai-nilai ke tampilan
+                    if (firebaseWeight != null) tvWeight.text = "$firebaseWeight kg"
+                    if (firebaseHeight != null) tvHeight.text = "$firebaseHeight cm"
+
+                    if (!firebaseName.isNullOrBlank()) tvUserName.text = firebaseName
+                    if (!firebaseEmail.isNullOrBlank()) tvUserEmail.text = firebaseEmail
+
+                    // Hitung umur dari birthYYYYmm (misal "200907" → 2009/07)
+                    if (!birthData.isNullOrBlank() && birthData.length >= 6) {
+                        try {
+                            val year = birthData.substring(0, 4).toInt()
+                            val month = birthData.substring(4, 6).toInt()
+                            val currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)
+                            val currentMonth = java.util.Calendar.getInstance().get(java.util.Calendar.MONTH) + 1
+                            var age = currentYear - year
+                            if (currentMonth < month) age--
+                            tvAge.text = "$age"
+                        } catch (e: Exception) {
+                            tvAge.text = "-"
+                        }
+                    }
+
+                    // Gambar profil
+                    if (!profileImage.isNullOrBlank() && isAdded) {
+                        Glide.with(this@UserProfileFragment)
+                            .load(profileImage)
+                            .placeholder(R.drawable.welcome)
+                            .error(R.drawable.welcome)
+                            .into(imgProfile)
+                    }
+                } else {
+                    // fallback ke users node lama
+                    loadBackupUserData()
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("FirebaseProfile", "Failed to read preferences: ${error.message}")
+                loadBackupUserData()
+            }
+        })
+    }
+
+    /** 🔹 Fallback jika users_personal_preferences tidak ditemukan */
+    private fun loadBackupUserData() {
         if (!::userRef.isInitialized) return
 
         userRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -90,38 +142,10 @@ class UserProfileFragment : Fragment() {
                 }
             }
 
-            override fun onCancelled(error: DatabaseError) {
-                Log.e("FirebaseProfile", "Failed to read Firebase value: ${error.message}")
-            }
+            override fun onCancelled(error: DatabaseError) {}
         })
     }
 
-    /** 🔹 Ambil tinggi & berat dari node "users_personal_preferences" */
-    private fun loadUserPreferencesData() {
-        if (!::preferencesRef.isInitialized) return
-
-        preferencesRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    val berat = snapshot.child("berat").getValue(String::class.java)
-                    val tinggi = snapshot.child("tinggi").getValue(String::class.java)
-                    val umur = snapshot.child("umur").getValue(String::class.java)
-
-                    if (!berat.isNullOrBlank()) tvWeight.text = "$berat kg"
-                    if (!tinggi.isNullOrBlank()) tvHeight.text = "$tinggi cm"
-                    if (!umur.isNullOrBlank()) tvAge.text = umur
-                } else {
-                    Log.w("UserProfile", "⚠️ Data preferences tidak ditemukan di Firebase.")
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.e("UserProfile", "Gagal ambil preferences: ${error.message}")
-            }
-        })
-    }
-
-    /** 🔹 Realtime heart rate listener */
     private fun listenRealtimeHeartRate() {
         val hrRef = FirebaseDatabase.getInstance("https://smartbandforteens-default-rtdb.asia-southeast1.firebasedatabase.app/")
             .getReference("data_iot").child("device_001").child("heart_rate")
@@ -138,7 +162,6 @@ class UserProfileFragment : Fragment() {
         })
     }
 
-    /** 🔹 Ambil cache dari SharedPreferences jika offline */
     private fun loadSharedPreferencesData() {
         val pref = requireContext().getSharedPreferences("user_profile", Context.MODE_PRIVATE)
 
@@ -159,9 +182,9 @@ class UserProfileFragment : Fragment() {
             imgProfile.setImageResource(R.drawable.welcome)
         }
 
-        tvAge.text = pref.getString("age", "0")
-        tvWeight.text = pref.getString("weight", "0.0")
-        tvHeight.text = pref.getString("height", "0.0")
+        tvAge.text = pref.getString("age", "-")
+        tvWeight.text = pref.getString("weight", "0 kg")
+        tvHeight.text = pref.getString("height", "0 cm")
     }
 
     private fun showBottomNavBar() {
