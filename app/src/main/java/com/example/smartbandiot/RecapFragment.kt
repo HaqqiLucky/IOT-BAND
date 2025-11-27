@@ -31,7 +31,6 @@ class RecapFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
-        // 🔹 Ambil data history terbaru
         userRPE.child(uid).limitToLast(1).get()
             .addOnSuccessListener { snapshot ->
                 var distance = 0.0
