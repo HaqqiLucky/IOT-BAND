@@ -22,17 +22,20 @@ class RecapFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentRecapBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
+        // Ambil history terakhir
         userRPE.child(uid).limitToLast(1).get()
             .addOnSuccessListener { snapshot ->
+
                 var distance = 0.0
                 var step = 0.0
                 var hr = 0.0
@@ -46,20 +49,27 @@ class RecapFragment : Fragment() {
                     }
                 }
 
+                // Tampilkan ke UI
+                binding.angkaDistance.text = String.format("%.2f Km", distance)
+                binding.angkaHR.text = String.format("%.0f", hr)
+
                 Log.d("RecapFragment", "Latest data: $distance km | $step step | $hr bpm")
 
+                // EASY → tambah 1.5%
                 binding.RPEEasy.setOnClickListener {
-                    val target = if (distance > 0) distance + (distance * 0.015) else 0.1
+                    val target = if (distance > 0) distance * 1.015 else 0.1
                     saveChallenge(uid, "Easy", target, hr, step, distance)
                 }
 
+                // NORMAL → tetap
                 binding.RPENormal.setOnClickListener {
                     val target = if (distance > 0) distance else 0.1
                     saveChallenge(uid, "Normal", target, hr, step, distance)
                 }
 
+                // HARD → kurang 0.5%
                 binding.RPEHard.setOnClickListener {
-                    val target = if (distance > 0) distance - (distance * 0.005) else 0.1
+                    val target = if (distance > 0) distance * 0.995 else 0.1
                     saveChallenge(uid, "Tired", target, hr, step, distance)
                 }
             }
@@ -68,8 +78,14 @@ class RecapFragment : Fragment() {
             }
     }
 
-    /** 🔹 Simpan challenge baru lengkap dengan HR & Step dari history terakhir */
-    private fun saveChallenge(uid: String, rpe: String, target: Double, hr: Double, step: Double, distance: Double) {
+    private fun saveChallenge(
+        uid: String,
+        rpe: String,
+        target: Double,
+        hr: Double,
+        step: Double,
+        distance: Double
+    ) {
         val db = Firebase.database
         val userChallengesRef = db.getReference("users").child(uid).child("challenges")
 
@@ -84,23 +100,32 @@ class RecapFragment : Fragment() {
         )
 
         val newRef = userChallengesRef.push()
-        newRef.setValue(challengeData).addOnSuccessListener {
-            db.getReference("users").child(uid).child("today_challenge").setValue(challengeData)
-            trimOldChallenges(uid)
-            gotoFinish()
-        }
+        newRef.setValue(challengeData)
+            .addOnSuccessListener {
+                // update today challenge
+                db.getReference("users").child(uid)
+                    .child("today_challenge")
+                    .setValue(challengeData)
+
+                trimOldChallenges(uid)
+                gotoFinish()
+            }
     }
 
-    /** 🔹 Batasi maksimal 3 challenge */
+    /** Hanya simpan 3 challenge terakhir */
     private fun trimOldChallenges(uid: String) {
-        val userChallengesRef = Firebase.database.getReference("users").child(uid).child("challenges")
+        val userChallengesRef = Firebase.database
+            .getReference("users")
+            .child(uid)
+            .child("challenges")
+
         userChallengesRef.orderByChild("timestamp")
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.childrenCount > 3) {
                         val extra = snapshot.childrenCount - 3
                         snapshot.children.take(extra.toInt()).forEach { it.ref.removeValue() }
-                        Log.d("RecapFragment", "🧹 Hapus $extra challenge lama.")
+                        Log.d("RecapFragment", "Hapus $extra challenge lama.")
                     }
                 }
 
@@ -112,5 +137,10 @@ class RecapFragment : Fragment() {
         val intent = Intent(requireContext(), RpeFinishingRequestActivity::class.java)
         startActivity(intent)
         requireActivity().finish()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
